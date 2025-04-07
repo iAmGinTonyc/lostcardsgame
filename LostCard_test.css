@@ -1,0 +1,656 @@
+/* Подключение пользовательского шрифта */
+@font-face {
+  font-family: 'FingerPaint';
+  src: url('FingerPaint-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  }
+  
+  /* Глобальные стили */
+  * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  }
+  
+  /* Применение нового шрифта ко всему документу */
+  body {
+  font-family: 'FingerPaint', Arial, sans-serif; /* Fallback на Arial, если шрифт не загрузится */
+  background-color: #f4f4f4;
+  padding: 20px;
+  }
+  
+  /* Контейнер для левой панели (фильтры), центральной галереи и правой панели */
+  .container {
+  display: flex;
+  gap: 20px; /* Расстояние между элементами */
+  align-items: flex-start; /* Выравниваем элементы по верху */
+  margin-left: calc(20% + 40px); /* Отступ слева для центральной галереи */
+  margin-right: calc(20% + 40px); /* Отступ справа для правой панели */
+  }
+  
+  /* Новая нижняя панель */
+.bottom-panel {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: transparent; /* Убираем серый фон */
+  box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.1); /* Тень сверху */
+  padding: 10px;
+  display: flex;
+  justify-content: flex-start; /* Выравниваем по левому краю */
+  align-items: center; /* Центрируем по вертикали */
+  gap: 20px; /* Расстояние между кнопками */
+  padding-left: 20%; /* Добавляем отступ слева (20%) */
+  z-index: 1000; /* Чтобы панель была поверх других элементов */
+}
+
+/* Стили для кнопки "Deselect" */
+#deselect-all-cards {
+  position: relative; /* Нужно для позиционирования счетчика */
+  display: block;
+  margin-top: 20px;
+  padding: 10px 40px; /* Увеличенные отступы для удобства */
+  background-color: #a71515; /* Белый фон */
+  color: #fff; /* Чёрный текст */
+  border: 1.5px solid #a71515; /* Черный ободок */
+  border-radius: 30px; /* Полностью округлённая форма */
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold; /* Жирный текст */
+  transition: background-color 0.3s, color 0.3s, border-color 0.3s; /* Плавные переходы */
+  text-align: center; /* Центрируем текст */
+  position: relative; /* Для счетчика */
+}
+
+#deselect-all-cards:hover {
+  background-color: #fff; /* Фон становится черным при наведении */
+  color: #a71515; /* Текст становится белым */
+  border-color: #a71515; /* Ободок остаётся черным */
+}
+
+/* Кнопка "Selected" в нижней панели */
+#selected-cards-button {
+  position: relative; /* Нужно для позиционирования счетчика */
+  display: block;
+  margin-top: 20px;
+  padding: 10px 40px; /* Увеличенные отступы для удобства */
+  background-color: #fff; /* Белый фон */
+  color: #000; /* Чёрный текст */
+  border: 1.5px solid #000000; /* Черный ободок */
+  border-radius: 30px; /* Полностью округлённая форма */
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold; /* Жирный текст */
+  transition: background-color 0.3s, color 0.3s, border-color 0.3s; /* Плавные переходы */
+  text-align: center; /* Центрируем текст */
+  position: relative; /* Для счетчика */
+}
+
+#selected-cards-button:hover {
+  background-color: #000000; /* Фон становится черным при наведении */
+  color: #fff; /* Текст становится белым */
+  border-color: #000000; /* Ободок остаётся черным */
+}
+
+/* Счетчик выбранных карт */
+#selected-counter {
+  position: absolute; /* Позиционирование относительно кнопки */
+  top: -10px; /* Смещение вверх */
+  right: -10px; /* Смещение вправо */
+  background-color: #000000; /* Черный фон */
+  color: #fff; /* Белый текст */
+  font-size: 12px;
+  font-weight: bold;
+  padding: 5px 10px; /* Внутренние отступы */
+  border-radius: 3cm; /* Округление углов */
+  min-width: 45px; /* Минимальная ширина */
+  text-align: center; /* Центрирование текста */
+  display: none; /* Скрыт по умолчанию */
+  z-index: 1; /* Счетчик поверх кнопки */
+}
+
+/* Стили для кнопки "Mint" */
+#mint-button {
+  position: relative;
+  display: block;
+  margin-top: 20px;
+  padding: 10px 40px; /* Увеличенные отступы для удобства */
+  background-color: #a71515; /* Красный фон */
+  color: #fff; /* Белый текст */
+  border: none; /* Убираем границу */
+  border-radius: 30px; /* Закругление как у кнопки "Selected" */
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold; /* Жирный текст */
+  transition: background-color 0.3s, color 0.3s; /* Плавные переходы */
+  text-align: center; /* Центрируем текст */
+  border: 1.5px solid #a71515; /* Черный ободок */
+}
+
+#mint-button:hover {
+  background-color: #fff; /* Темно-красный при наведении */
+  color: #a71515; /* Текст остается белым */
+  border-color: #a71515; /* Ободок остаётся черным */
+}
+
+/* Стили для поп-апа */
+.popup {
+  display: none; /* Скрыт по умолчанию */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8); /* Полупрозрачный фон */
+  z-index: 2000; /* На переднем плане */
+  justify-content: center; /* Центрируем содержимое */
+  align-items: center; /* Центрируем содержимое */
+}
+
+/* Содержимое поп-апа */
+.popup-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  width: 95%; /* 95% ширины экрана */
+  height: 95%; /* 95% высоты экрана */
+  overflow-y: auto; /* Прокрутка, если контент не помещается */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+/* Крестик закрытия поп-апа */
+.close-popup {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 24px;
+  cursor: pointer;
+  color: #000; /* Черный цвет текста */
+  z-index: 2001; /* Выше содержимого */
+}
+
+.close-popup:hover {
+  color: #ff4d4d; /* Красный цвет при наведении */
+}
+
+/* Верхняя часть поп-апа */
+.popup-header {
+  background-color: #e0e0e0; /* Серый цвет */
+  padding: 20px;
+  border-radius: 12px 12px 0 0; /* Закругление только верхних углов */
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20px; /* Отступ между заголовком и содержимым */
+}
+
+/* Галерея выбранных карт внутри поп-апа */
+.selected-cards-gallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px; /* Расстояние между элементами */
+}
+
+/* Контейнер для одной карточки */
+.selected-card-item {
+  display: flex;
+  align-items: center; /* Выравниваем по центру */
+  gap: 10px; /* Расстояние между изображением и текстом */
+  width: calc(25% - 20px); /* 4 карточки в строке (25% ширины минус отступы) */
+  background-color: #f9f9f9; /* Светлый фон для карточки */
+  padding: 10px;
+  border-radius: 8px; /* Закругление углов */
+  transition: background-color 0.3s; /* Плавное изменение фона */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Эффект тени */
+}
+
+/* Изображение карточки */
+.selected-card-item img {
+  max-width: 140px; /* Фиксированная ширина изображения */
+  max-height: 140px; /* Фиксированная высота изображения */
+  object-fit: contain; /* Сохраняет пропорции */
+}
+
+/* Название карточки */
+.selected-card-name {
+  flex-grow: 1; /* Занимает всё доступное пространство */
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+}
+
+/* Крестик для удаления карточки */
+.selected-card-remove {
+  font-size: 18px;
+  font-weight: bold;
+  color: #ff4d4d; /* Красный цвет */
+  cursor: pointer;
+  transition: color 0.3s; /* Плавное изменение цвета */
+}
+
+.selected-card-remove:hover {
+  color: #c22113; /* Темно-красный при наведении */
+}
+
+
+/* Стили для поп-апа */
+#mint-popup {
+  display: none; /* Скрыт по умолчанию */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8); /* Полупрозрачный фон */
+  z-index: 2000; /* На переднем плане */
+  justify-content: center; /* Центрируем содержимое */
+  align-items: center; /* Центрируем содержимое */
+}
+
+/* Содержимое поп-апа */
+#mint-popup .popup-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  width: 95%; /* Ширина 95% экрана */
+  height: 95%; /* Высота 95% экрана */
+  overflow-y: auto; /* Прокрутка, если контент не помещается */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+/* Заголовок поп-апа */
+#mint-popup .popup-header {
+  background-color: #e0e0e0; /* Серый цвет */
+  padding: 20px;
+  border-radius: 12px 12px 12px 12px; /* Закругление только верхних углов */
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20px; /* Отступ между заголовком и содержимым */
+}
+
+/* Крестик закрытия поп-апа */
+#mint-popup .close-popup {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 24px;
+  cursor: pointer;
+  color: #000; /* Черный цвет текста */
+  z-index: 2001; /* Выше содержимого */
+}
+
+#mint-popup .close-popup:hover {
+  color: #ff4d4d; /* Красный цвет при наведении */
+}
+
+  /* Левая панель с фильтрами */
+  .filters {
+  width: 15%;
+  background: #fff;
+  padding: 20px;
+  box-shadow: 8px 0 16px rgba(0, 0, 0, 0.2); /* Усиленная тень справа */
+  border-radius: 0 12px 12px 0; /* Закругление только правой стороны */
+  position: fixed; /* Плавающая панель */
+  left: 0; /* Прижимаем к левому краю */
+  top: 20px; /* Отступ сверху */
+  height: calc(100vh - 40px); /* Высота панели равна высоте экрана минус отступы */
+  overflow-y: auto; /* Добавляем прокрутку, если контент не помещается */
+  z-index: 1000; /* Чтобы панель была поверх других элементов */
+  }
+  
+  /* Блок для статуса */
+  .status-box {
+  background-color: #E9E9E9; /* Серый цвет */
+  padding: 15px;
+  border-radius: 0 12px 12px 0; /* Закругление только правой стороны */
+  box-shadow: 8px 0 16px rgba(0, 0, 0, 0.2); /* Тень справа */
+  margin-bottom: 20px; /* Отступ между блоком статуса и остальной панелью */
+  }
+  
+  .status-label {
+  font-size: 14px;
+  color: #666; /* Темно-серый текст */
+  text-transform: uppercase; /* Верхний регистр */
+  margin-bottom: 5px; /* Отступ между надписями */
+  }
+  
+  .status-value {
+  font-size: 24px;
+  font-weight: bold;
+  color: #C22113; /* Чёрный текст */
+  text-transform: uppercase; /* Верхний регистр */
+  }
+  
+  .filters h2 {
+  margin-bottom: 15px;
+  font-size: 18px;
+  }
+  
+  .filters ul {
+  list-style: none;
+  padding: 0;
+  }
+  
+  .filters li {
+  display: flex;
+  justify-content: space-between; /* Размещаем текст и значок */
+  align-items: center; /* Центрируем содержимое по вертикали */
+  padding: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  }
+  
+  .filters li:hover {
+  background-color: #e0e0e0;
+  }
+  
+  .filter-icon {
+  font-size: 18px;
+  font-weight: bold;
+  transition: transform 0.3s; /* Плавное вращение значка */
+  }
+  
+  /* Стиль для активного состояния (крестик) */
+  .filter-icon.active {
+  transform: rotate(45deg); /* Поворот на 45 градусов */
+  }
+  
+  /* Отображение выбранных рангов */
+  #selected-ranks-container {
+  margin-top: 20px;
+  }
+  
+  .selected-rank-item {
+  background: #f0f0f0;
+  color: #666;
+  padding: 5px 15px;
+  border-radius: 50px;
+  display: inline-block;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s;
+  }
+  
+  .selected-rank-item:hover {
+  background: #d0d0d0;
+  }
+  
+  
+  /* Центральная галерея карт */
+  .gallery {
+  width: calc(70% - 20px); /* Ширина центральной галереи (оставшееся пространство) */
+  background: transparent; /* Убираем фон */
+  padding: 0; /* Убираем отступы */
+  border: none; /* Убираем границы */
+  margin: 0 auto; /* Центрируем галерею */
+  }
+  
+  /* Заголовок "LOST WOLVES" */
+  .gallery h2 {
+  font-size: 4rem; /* Увеличиваем шрифт (в два раза больше обычного) */
+  font-weight: bold;
+  text-align: center; /* Центрируем текст */
+  margin-bottom: 30px; /* Добавляем отступ снизу */
+  background: linear-gradient(to top, #ffffff, #000000); /* Градиент: белый снизу, чёрный сверху */
+  -webkit-background-clip: text; /* Применяем градиент к тексту */
+  background-clip: text;
+  color: transparent; /* Делаем текст прозрачным, чтобы был виден градиент */
+  text-transform: uppercase; /* Верхний регистр */
+  }
+  
+  /* Горизонтальная полоса */
+  .horizontal-line {
+  width: 100%; /* Ширина полосы */
+  height: 2px; /* Толщина полосы */
+  background: #808080; /* Серый цвет */
+  margin: 15px auto; /* Отступ сверху и снизу */
+  }
+  
+  /* Фильтрация по мастям */
+  .suit-filters-container {
+  position: sticky;
+  top: 27px; /* Прилипает к верху экрана */
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-bottom: 20px;
+  z-index: 1000;
+  }
+  
+  .suit-filter-column div {
+  background: #f0f0f0;
+  color: #333;
+  padding: 10px 20px;
+  border: 1px solid #ccc;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s;
+  }
+  
+  .suit-filter-column div.active {
+  background: #ccc;
+  color: #000;
+  border-color: #aaa;
+  }
+  
+  /* Галерея карт */
+  #card-gallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  }
+  
+  .card-item {
+  width: calc(25% - 12px); /* Четыре карты в строке */
+  text-align: center;
+  }
+  
+  /* Общий стиль для карточек */
+.card {
+  position: relative;
+  width: 90%;
+  height: 100%; /* Фиксированная высота карточки */
+  filter: blur(1.5px); /* Размытие по умолчанию */
+  transition: all 0.3s ease; /* Плавный переход */
+  cursor: pointer;
+  transform: scale(1); /* Нормальный размер */
+}
+.card:hover {
+  filter: blur(0); /* Убираем размытие */
+  transform: scale(1.1); /* Увеличиваем на 10% */
+  z-index: 1; /* Поднимаем карточку выше остальных */
+  transition: all 0.3s ease; /* Плавный переход */
+}
+
+.card.selected {
+  filter: blur(0); /* Убираем размытие */
+  transform: scale(1.05); /* Увеличиваем на 5% */
+  z-index: 1; /* Поднимаем карточку выше остальных */
+  position: relative; /* Нужно для позиционирования эффекта искр */
+}
+
+.card.selected::before,
+.card.selected::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 140px;
+  height: 140px;
+  background: url('fire.png') no-repeat center center; /* Ваша картинка */
+  background-size: contain; /* Масштабируем картинку */
+  transform: translate(-50%, -50%);
+ 
+}
+
+  .card img {
+  max-width: 100%; /* Изображение не выходит за пределы карточки */
+  max-height: 100%; /* Изображение не выходит за пределы карточки */
+  object-fit: contain; /* Сохраняет пропорции изображения */
+  transition: transform 0.3s ease; /* Плавный переход для изображения */
+  }
+  
+  /* Подпись под картой */
+  .card-label {
+  font-size: 14px; /* Меньший шрифт */
+  margin-top: -5px;
+  color: #333;
+  cursor: pointer;
+  text-transform: capitalize;
+  }
+  
+  .card-label:hover {
+  text-decoration: underline;
+  }
+  
+  /* Overlay to block interaction with the rest of the page */
+  .overlay {
+  display: none; /* Hidden by default */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.1); /* Полупрозрачный фон */
+  z-index: 999; /* Под модальным окном */
+  }
+  
+  /* Modal window */
+  .modal {
+  display: none; /* Hidden by default */
+  position: absolute; /* Positioned relative to the document */
+  z-index: 1000;
+  background-color: #000; /* Black background */
+  color: #fff; /* White text */
+  padding: 15px; /* Уменьшенные отступы */
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  max-width: 300px; /* Ширина осталась прежней */
+  max-height: 200px; /* Ограничение по высоте */
+  overflow-y: auto; /* Прокрутка, если текст не помещается */
+  text-align: center;
+  }
+  
+  .modal p {
+  font-size: 14px; /* Уменьшенный размер текста */
+  line-height: 1.4; /* Более плотная строка */
+  margin: 0;
+  color: #fff; /* White text */
+  }
+  
+  .close-container {
+  position: absolute;
+  right: 5px; /* Позиция справа */
+  top: -1px; /* Позиция сверху */
+  display: flex; /* Размещаем элементы в ряд */
+  align-items: center; /* Центрируем по вертикали */
+  cursor: pointer;
+  }
+  
+  .close-text {
+  font-size: 14px; /* Размер текста */
+  color: #fff; /* Белый цвет текста */
+  margin-right: 5px; /* Отступ между текстом и картинкой */
+  transition: opacity 0.3s; /* Плавный эффект при наведении */
+  }
+  
+  .close-icon {
+  width: 18px; /* Размер картинки */
+  height: 18px; /* Размер картинки */
+  background: url('close-icon.png') no-repeat center center; /* Ваша картинка */
+  background-size: contain; /* Масштабируем картинку */
+  transition: opacity 0.3s; /* Плавный эффект при наведении */
+  }
+  
+  .close-container:hover .close-text,
+  .close-container:hover .close-icon {
+  opacity: 0.7; /* Эффект затемнения при наведении */
+  }
+  
+  /* Правая панель */
+  .right-panel {
+  width: 15%;
+  background: #000; /* Чёрный фон */
+  color: #fff; /* Белый текст */
+  padding: 20px;
+  box-shadow: -8px 0 16px rgba(0, 0, 0, 0.2); /* Тень слева */
+  border-radius: 12px 0 0 12px; /* Закругление только левой стороны */
+  position: fixed; /* Фиксированная позиция */
+  right: 0; /* Прижимаем к правому краю */
+  top: 20px; /* Отступ сверху */
+  height: calc(100vh - 40px); /* Высота панели равна высоте экрана минус отступы */
+  overflow-y: auto; /* Добавляем прокрутку, если контент не помещается */
+  transition: none; /* Убираем анимацию */
+  z-index: 1000; /* Чтобы панель была поверх других элементов */
+  }
+  
+  .right-panel-header {
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 20px;
+  }
+  
+  .totem-list {
+  display: block; /* Всегда показываем содержимое */
+  }
+  
+  .totem-item {
+  display: flex;
+  align-items: center; /* Выравниваем по вертикали */
+  gap: 30px; /* Расстояние между счетчиком и картинкой */
+  margin-bottom: 20px;
+  }
+  
+  .totem-counter {
+  font-size: 16px;
+  font-weight: bold;
+  min-width: 30px; /* Минимальная ширина для выравнивания */
+  text-align: right; /* Выравниваем счетчик по правому краю */
+  }
+  
+  .totem-image {
+  width: 100px; /* Ширина картинки */
+  height: 100px; /* Высота картинки */
+  object-fit: contain; /* Сохраняем пропорции картинки */
+  }
+  
+  /* Эффект огня */
+.fire-effect {
+  position: relative;
+  overflow: hidden;
+}
+
+.fire-effect::before {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(255, 96, 0, 0.8), transparent);
+  transform: translateX(-50%) translateY(-50%);
+  filter: blur(10px);
+  animation: fire-animation 0.8s infinite alternate;
+  z-index: -1;
+}
+
+@keyframes fire-animation {
+  0% {
+    transform: translateX(-50%) translateY(-50%) scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateX(-50%) translateY(-80%) scale(1.2);
+    opacity: 0.4;
+  }
+}

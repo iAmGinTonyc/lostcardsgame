@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Card Gallery</title>
+<link rel="stylesheet" href="LostCard_test.css"> <!-- Подключение CSS -->
+</head>
+<body>
+<!-- Overlay to block interaction -->
+<div class="overlay"></div>
+
+<!-- Modal window for card description -->
+<div id="modal-description" class="modal">
+<div class="close-container">
+<span class="close-text">Close</span>
+<div class="close-icon"></div>
+</div>
+<p id="modal-text"></p>
+</div>
+
+<!-- Новая нижняя панель -->
+<div class="bottom-panel">
+<button id="deselect-all-cards">Deselect All Cards</button>
+<button id="selected-cards-button">
+  Selected
+  <div id="selected-counter">0</div> <!-- Счетчик выбранных карт -->
+</button>
+<button id="mint-button">Mint</button> <!-- Новая кнопка "Mint" -->
+</div>
+</div>
+
+<!-- Поп-ап для Mint -->
+<div id="mint-popup" class="popup">
+  <div class="popup-content">
+    <div class="popup-header">MINT</div>
+    <p>Вы нажали кнопку Mint!</p>
+    <span class="close-popup">&times;</span>
+  </div>
+</div>
+
+<!-- Поп-ап для выбранных карт -->
+<div id="selected-cards-popup" class="popup">
+  <div class="popup-content">
+    <!-- Верхняя серая часть -->
+    <div class="popup-header">Your selected cards</div>
+    <!-- Галерея выбранных карт -->
+    <div id="selected-cards-gallery" class="selected-cards-gallery"></div>
+    <!-- Крестик для закрытия поп-апа -->
+    <span class="close-popup">&times;</span>
+  </div>
+</div>
+
+<!-- Левая панель с фильтрами -->
+<div class="filters">
+<!-- Блок для статуса -->
+<div class="status-box">
+<div class="status-label">Your Status</div>
+<div class="status-value">UNGODLY</div>
+</div>
+
+<h2>Filter by Rank</h2>
+<ul id="rank-filters">
+  <!-- Список рангов -->
+  <li data-rank="2">
+    Two
+  </li>
+  <li data-rank="3">
+    Three
+  </li>
+  <li data-rank="4">
+    Four
+  </li>
+  <li data-rank="5">
+    Five
+  </li>
+  <li data-rank="6">
+    Six
+  </li>
+  <li data-rank="7">
+    Seven
+  </li>
+  <li data-rank="8">
+    Eight
+  </li>
+  <li data-rank="9">
+    Nine
+  </li>
+  <li data-rank="10">
+    Ten
+  </li>
+  <li data-rank="jack">
+    Jack
+  </li>
+  <li data-rank="queen">
+    Queen
+  </li>
+  <li data-rank="king">
+    King
+  </li>
+  <li data-rank="ace">
+    Ace
+  </li>
+  <li data-rank="jokers">
+    Jokers
+  </li>
+  <li data-rank="all">
+    Clear Filter
+  </li>
+</ul>
+
+<!-- Отображение выбранных рангов -->
+<div id="selected-ranks-container">
+<p>No ranks selected</p>
+</div>
+</div>
+
+<!-- Центральная панель (галерея) -->
+<div class="gallery">
+<h2>LOST WOLVES</h2>
+<div class="horizontal-line"></div> <!-- Горизонтальная полоса -->
+
+<!-- Фильтрация по мастям -->
+<div class="suit-filters-container">
+<div class="suit-filter-column">
+<div data-suit="all">All Suits</div>
+</div>
+<div class="suit-filter-column">
+<div data-suit="hearts">Hearts</div>
+</div>
+<div class="suit-filter-column">
+<div data-suit="spades">Spades</div>
+</div>
+<div class="suit-filter-column">
+<div data-suit="clubs">Clubs</div>
+</div>
+<div class="suit-filter-column">
+<div data-suit="diamonds">Diamonds</div>
+</div>
+</div>
+
+<!-- Галерея карт -->
+<div id="card-gallery">
+<!-- Cards will be added dynamically -->
+</div>
+</div>
+
+<!-- Правая панель -->
+<div class="right-panel">
+<div class="right-panel-header">
+LOST TOTEMS
+</div>
+<div class="totem-list">
+<div class="totem-item">
+<span class="totem-counter">x0</span>
+<img src="losttotem.png" alt="Lost Totem" class="totem-image">
+</div>
+<div class="totem-item">
+<span class="totem-counter">x0</span>
+<img src="losttotem.png" alt="Lost Totem" class="totem-image">
+</div>
+<div class="totem-item">
+<span class="totem-counter">x0</span>
+<img src="losttotem.png" alt="Lost Totem" class="totem-image">
+</div>
+<div class="totem-item">
+<span class="totem-counter">x0</span>
+<img src="losttotem.png" alt="Lost Totem" class="totem-image">
+</div>
+<div class="totem-item">
+<span class="totem-counter">x0</span>
+<img src="losttotem.png" alt="Lost Totem" class="totem-image">
+</div>
+<div class="totem-item">
+<span class="totem-counter">x0</span>
+<img src="losttotem.png" alt="Lost Totem" class="totem-image">
+</div>
+<div class="totem-item">
+<span class="totem-counter">x0</span>
+<img src="losttotem.png" alt="Lost Totem" class="totem-image">
+</div>
+</div>
+</div>
+
+<script src="LostCard_test.js"></script> <!-- Подключение JS -->
+</body>
+</html>
