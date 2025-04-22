@@ -176,9 +176,19 @@ function applyFilters() {
   // Фильтрация по рангам
   if (selectedRanks.size > 0) {
     if (selectedRanks.has("selected")) {
-      filteredCards = filteredCards.filter(card => selectedCards.includes(`${card.rank} of ${card.suit}`));
+      // Если выбран фильтр "Selected", показываем только выбранные карты
+      filteredCards = filteredCards.filter(card =>
+        selectedCards.includes(`${card.rank} of ${card.suit}`)
+      );
     } else {
-      filteredCards = filteredCards.filter(card => selectedRanks.has(card.rank));
+      // Обработка джокеров и других рангов
+      filteredCards = filteredCards.filter(card => {
+        const isJoker = card.suit === "jokers"; // Проверка, является ли карта джокером
+        return (
+          (selectedRanks.has("jokers") && isJoker) || // Показываем джокеров, если они выбраны
+          (!isJoker && selectedRanks.has(card.rank)) // Показываем другие карты, если их ранг выбран
+        );
+      });
     }
   }
 
@@ -187,48 +197,93 @@ function applyFilters() {
     filteredCards = filteredCards.filter(card => card.suit === currentSuit);
   }
 
+  // Отображаем отфильтрованные карты
   displayCards(filteredCards);
 }
 
 // Обработчик кликов на фильтры по рангу
-document.querySelectorAll("#rank-filters li").forEach(filter => {
-  const rank = filter.getAttribute("data-rank");
-
-  filter.addEventListener("click", () => {
+document.querySelector("#rank-filters").addEventListener("click", (event) => {
+  const target = event.target;
+  if (target.tagName === "LI") {
+    const rank = target.getAttribute("data-rank");
     if (rank === "all") {
-      // Если выбран "Clear Filter", очищаем все выбранные ранги
       selectedRanks.clear();
     } else {
-      // Добавляем или удаляем ранг из набора выбранных
       if (selectedRanks.has(rank)) {
         selectedRanks.delete(rank);
       } else {
         selectedRanks.add(rank);
       }
     }
-
-    // Применяем фильтры и обновляем интерфейс
     applyFilters();
     updateSelectedRanksDisplay();
     saveData();
-
     // Визуальная подсветка активных фильтров
     document.querySelectorAll("#rank-filters li").forEach(item => {
       item.classList.toggle("active", selectedRanks.has(item.getAttribute("data-rank")));
     });
-  });
+  }
+});
+
+// Открытие поп-апа Login/Register
+document.getElementById("login-register-button").addEventListener("click", () => {
+  const popup = document.getElementById("login-register-popup");
+  popup.style.display = "flex"; // Показываем поп-ап
+});
+
+// Закрытие поп-апа при нажатии на крестик
+document.querySelector("#login-register-popup .close-popup").addEventListener("click", () => {
+  const popup = document.getElementById("login-register-popup");
+  popup.style.display = "none"; // Скрываем поп-ап
+});
+
+// Закрытие поп-апа при клике вне его области
+document.getElementById("login-register-popup").addEventListener("click", (event) => {
+  if (event.target === event.currentTarget) {
+    const popup = document.getElementById("login-register-popup");
+    popup.style.display = "none"; // Скрываем поп-ап
+  }
+});
+
+// Обработка отправки формы
+document.getElementById("login-register-form").addEventListener("submit", (event) => {
+  event.preventDefault(); // Предотвращаем отправку формы
+  const username = document.getElementById("username").value;
+  const password = document.getElementById("password").value;
+
+  // Пример обработки данных
+  console.log("Username:", username);
+  console.log("Password:", password);
+
+  // Закрываем поп-ап после отправки
+  const popup = document.getElementById("login-register-popup");
+  popup.style.display = "none";
+
+  // Очищаем форму
+  event.target.reset();
 });
 
 // Обработчик кликов на фильтры по мастям
 document.querySelectorAll(".suit-filter-column div").forEach(filter => {
   filter.addEventListener("click", () => {
-    document.querySelectorAll(".suit-filter-column div").forEach(div => {
-      div.classList.remove("active");
-    });
+    const suit = filter.getAttribute("data-suit");
 
-    filter.classList.add("active");
-    currentSuit = filter.getAttribute("data-suit");
+    // Если текущая масть уже выбрана, сбрасываем фильтр на "all"
+    if (currentSuit === suit) {
+      currentSuit = "all";
+      document.querySelectorAll(".suit-filter-column div").forEach(div => {
+        div.classList.remove("active"); // Убираем подсветку всех кнопок
+      });
+    } else {
+      // Иначе выбираем новую масть
+      currentSuit = suit;
+      document.querySelectorAll(".suit-filter-column div").forEach(div => {
+        div.classList.remove("active"); // Убираем подсветку всех кнопок
+      });
+      filter.classList.add("active"); // Подсвечиваем выбранную кнопку
+    }
 
+    // Применяем фильтры и сохраняем данные
     applyFilters();
     saveData();
   });
@@ -269,11 +324,12 @@ function updateSelectedRanksDisplay() {
 
 // Кнопка "Deselect All Cards" в нижней панели
 document.getElementById("deselect-all-cards").addEventListener("click", () => {
-  selectedCards = [];
+  selectedCards = []; // Очищаем массив выбранных карт
   document.querySelectorAll(".card.selected").forEach(card => {
-    card.classList.remove("selected");
+    card.classList.remove("selected"); // Убираем класс "selected" со всех карточек
   });
-  saveData();
+  saveData(); // Сохраняем изменения в localStorage
+  updateSelectedCounter(); // Обновляем счетчик (он станет равен 0)
 });
 
 // Кнопка "Selected" в нижней панели
@@ -281,7 +337,7 @@ document.getElementById("selected-cards-button").addEventListener("click", () =>
   openSelectedCardsPopup();
 });
 
-// Функция для открытия поп-апа
+// Функция для открытия поп-апа с выбранными картами
 function openSelectedCardsPopup() {
   const popup = document.getElementById("selected-cards-popup");
   const gallery = document.getElementById("selected-cards-gallery");
@@ -290,8 +346,8 @@ function openSelectedCardsPopup() {
   gallery.innerHTML = "";
 
   // Отображаем выбранные карты
-  selectedCards.forEach(cardKey => {
-    const cardData = cards.find(card => `${card.rank} of ${card.suit}` === cardKey);
+  selectedCards.forEach((cardKey) => {
+    const cardData = cards.find((card) => `${card.rank} of ${card.suit}` === cardKey);
     if (cardData) {
       const cardItem = document.createElement("div");
       cardItem.classList.add("selected-card-item");
@@ -313,8 +369,26 @@ function openSelectedCardsPopup() {
       removeButton.addEventListener("click", () => {
         const index = selectedCards.indexOf(cardKey);
         if (index !== -1) {
-          selectedCards.splice(index, 1); // Удаляем карточку из массива
-          cardItem.remove(); // Удаляем карточку из DOM
+          // Удаляем карточку из массива
+          selectedCards.splice(index, 1);
+
+          // Находим соответствующую карточку в галерее и удаляем класс "selected"
+          const cardInGallery = document.querySelector(
+            `.card img[alt="Card ${cardData.rank} of ${cardData.suit}"]`
+          );
+          if (cardInGallery) {
+            const cardDiv = cardInGallery.parentElement;
+            cardDiv.classList.remove("selected"); // Убираем эффект огонька
+          }
+
+          // Удаляем карточку из DOM поп-апа
+          cardItem.remove();
+
+          // Обновляем счетчик выбранных карт
+          updateSelectedCounter();
+
+          // Сохраняем данные
+          saveData();
         }
       });
 
@@ -328,6 +402,54 @@ function openSelectedCardsPopup() {
   // Показываем поп-ап
   popup.style.display = "flex";
 }
+
+/// Функция для анимации счетчика
+function animateCounter(element, targetValue, duration = 1000) {
+  let start = 0; // Начальное значение
+  const stepTime = 100; // Время между шагами (в миллисекундах)
+  const steps = Math.ceil(duration / stepTime); // Количество шагов
+  const increment = Math.ceil(targetValue / steps); // Шаг увеличения
+
+  const interval = setInterval(() => {
+    start += increment;
+    if (start >= targetValue) {
+      element.textContent = targetValue; // Устанавливаем конечное значение
+      clearInterval(interval); // Останавливаем интервал
+    } else {
+      element.textContent = start; // Обновляем значение счетчика
+    }
+  }, stepTime);
+}
+
+// Обновление функции открытия поп-апа "Craft"
+document.getElementById("craft-button").addEventListener("click", () => {
+  const craftPopup = document.getElementById("craft-popup");
+  const selectedCardsCount = document.getElementById("selected-cards-count");
+
+  // Сначала устанавливаем начальное значение счетчика
+  selectedCardsCount.textContent = 0;
+
+  // Показываем поп-ап
+  craftPopup.style.display = "flex";
+
+  // Анимируем счетчик
+  animateCounter(selectedCardsCount, selectedCards.length);
+});
+
+// Закрытие поп-апа "Craft" при нажатии на крестик
+document.querySelector("#craft-popup .close-popup").addEventListener("click", () => {
+  const craftPopup = document.getElementById("craft-popup");
+  craftPopup.style.display = "none"; // Скрываем поп-ап
+});
+
+// Закрытие поп-апа "Craft" при клике вне его области
+document.getElementById("craft-popup").addEventListener("click", (event) => {
+  if (event.target === event.currentTarget) {
+    const craftPopup = document.getElementById("craft-popup");
+    craftPopup.style.display = "none"; // Скрываем поп-ап
+  }
+});
+
 
 // Закрытие поп-апа
 document.querySelector("#selected-cards-popup .close-popup").addEventListener("click", () => {
@@ -366,6 +488,57 @@ document.getElementById("mint-popup").addEventListener("click", (event) => {
   }
 });
 
+// Получаем ссылки на элементы
+const emailInput = document.getElementById("email");
+const passwordInput = document.getElementById("password");
+const emailLabel = document.getElementById("email-label");
+const passwordLabel = document.getElementById("password-label");
+
+// Функция для скрытия метки при фокусе
+function hideLabel(input, label) {
+  input.addEventListener("focus", () => {
+    label.style.display = "none"; // Скрываем метку
+  });
+}
+
+// Функция для показа метки, если поле пустое
+function showLabelIfEmpty(input, label) {
+  input.addEventListener("blur", () => {
+    if (!input.value.trim()) {
+      label.style.display = "block"; // Показываем метку, если поле пустое
+    }
+  });
+}
+
+// Применяем функции к полям ввода
+hideLabel(emailInput, emailLabel);
+showLabelIfEmpty(emailInput, emailLabel);
+
+hideLabel(passwordInput, passwordLabel);
+showLabelIfEmpty(passwordInput, passwordLabel);
+
+// Пример проверки ввода полей регистрации
+document.getElementById("login-register-form").addEventListener("submit", (event) => {
+  event.preventDefault(); // Предотвращаем отправку формы
+
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  if (!email || !password) {
+    alert("Please fill in both fields.");
+    return;
+  }
+
+  console.log("Email:", email);
+  console.log("Password:", password);
+
+  // Закрываем поп-ап после отправки
+  const popup = document.getElementById("login-register-popup");
+  popup.style.display = "none";
+
+  // Очищаем форму
+  event.target.reset();
+});
 
 
 // Инициализация страницы

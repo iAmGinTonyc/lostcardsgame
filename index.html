@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Card Gallery</title>
+<link rel="stylesheet" href="LostCard_test.css"> <!-- Подключение CSS -->
+</head>
+<body>
+<!-- Overlay to block interaction -->
+<div class="overlay"></div>
+
+<!-- Modal window for card description -->
+<div id="modal-description" class="modal">
+<div class="close-container">
+<span class="close-text">Close</span>
+<div class="close-icon"></div>
+</div>
+<p id="modal-text"></p>
+</div>
+
+<!-- Новая нижняя панель -->
+<div class="bottom-panel">
+<button id="deselect-all-cards">Deselect All Cards</button>
+<button id="selected-cards-button">
+  Selected
+  <div id="selected-counter">0</div> <!-- Счетчик выбранных карт -->
+</button>
+<button id="mint-button">Mint</button> <!-- Новая кнопка "Mint" -->
+</div>
+</div>
+
+<!-- Поп-ап для Mint -->
+<div id="mint-popup" class="popup">
+  <div class="popup-content">
+    <div class="popup-header">MINT</div>
+    <p>Вы нажали кнопку Mint!</p>
+    <span class="close-popup">&times;</span>
+  </div>
+</div>
+
+<!-- Поп-ап для выбранных карт -->
+<div id="selected-cards-popup" class="popup">
+  <div class="popup-content">
+    <!-- Верхняя серая часть -->
+    <div class="popup-header">Your selected cards</div>
+    <!-- Галерея выбранных карт -->
+    <div id="selected-cards-gallery" class="selected-cards-gallery"></div>
+    <!-- Правая панель с кнопкой "Craft" -->
+    <div class="craft-panel">
+      <button id="craft-button">Craft</button>
+    </div>
+    <!-- Крестик для закрытия поп-апа -->
+    <span class="close-popup">&times;</span>
+  </div>
+</div>
+
+<!-- Новый поп-ап для "Craft" -->
+<div id="craft-popup" class="popup">
+  <div class="popup-content">
+    <div class="craft-info-container">
+      <button id="burn-button">BURN</button>
+      <div class="craft-title">YOU selected for craft:</div>
+      <div class="card-counter-container">
+        <span id="selected-cards-count">0</span> Lost Cards
+      </div>
+      <div class="craft-text">Are you ready to burn them?</div>
+    </div>
+    <span class="close-popup">&times;</span>
+  </div>
+</div>
+
+<!-- Левая панель с фильтрами -->
+<div class="filters">
+ <!-- Блок для статуса -->
+<div class="status-box">
+  <div class="status-label">Your Status</div>
+  <div class="status-value">UNGODLY</div>
+  <!-- Кнопка Login/Register -->
+  <button id="login-register-button" class="login-register-button">
+    Login/Register
+  </button>
+</div>
+  
+  <h2>Filter by Rank</h2>
+  <ul id="rank-filters">
+    <!-- Список рангов -->
+    <li data-rank="2">Two</li>
+    <li data-rank="3">Three</li>
+    <li data-rank="4">Four</li>
+    <li data-rank="5">Five</li>
+    <li data-rank="6">Six</li>
+    <li data-rank="7">Seven</li>
+    <li data-rank="8">Eight</li>
+    <li data-rank="9">Nine</li>
+    <li data-rank="10">Ten</li>
+    <li data-rank="jack">Jack</li>
+    <li data-rank="queen">Queen</li>
+    <li data-rank="king">King</li>
+    <li data-rank="ace">Ace</li>
+    <li data-rank="jokers">Jokers</li>
+    <li data-rank="all">Clear Filter</li>
+  </ul>
+  </div>
+
+  <!-- Поп-ап для Login/Register -->
+<div id="login-register-popup" class="popup">
+  <div class="popup-content">
+    <!-- Убираем заголовок -->
+    <span class="close-popup">&times;</span>
+    <div class="popup-body">
+      <!-- Форма для входа/регистрации -->
+      <form id="login-register-form">
+        <div class="input-container">
+          <label for="email" class="floating-label">Email</label>
+          <input type="email" id="email" name="email" required />
+        </div>
+        <div class="input-container">
+          <label for="password" class="floating-label">Password</label>
+          <input type="password" id="password" name="password" required />
+        </div>
+        <!-- Изменяем текст кнопки -->
+        <button type="submit" class="login-register-button">Login/Register</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Центральная панель (галерея) -->
+<div class="gallery">
+  <h2 id="header-title">LOST WOLVES</h2>
+  <div class="horizontal-line"></div> <!-- Горизонтальная полоса -->
+  
+  <script>
+  // Возврат на главную страницу при клике на заголовок "LOST WOLVES"
+document.getElementById("header-title").addEventListener("click", () => {
+  window.location.href = "main.html"; // Переход на главную страницу
+});
+</script>
+<!-- Фильтрация по мастям -->
+<div class="suit-filters-container">
+<div class="suit-filter-column">
+<div data-suit="hearts">HEARTS</div>
+</div>
+<div class="suit-filter-column">
+<div data-suit="spades">SPADES</div>
+</div>
+<div class="suit-filter-column">
+<div data-suit="clubs">CLUBS</div>
+</div>
+<div class="suit-filter-column">
+<div data-suit="diamonds">DIAMONDS</div>
+</div>
+</div>
+
+<!-- Галерея карт -->
+<div id="card-gallery">
+<!-- Cards will be added dynamically -->
+</div>
+</div>
+
+<!-- Правая панель -->
+<div class="right-panel">
+<div class="right-panel-header">
+LOST TOTEMS
+</div>
+<div class="totem-list">
+<div class="totem-item">
+<span class="totem-counter">x0</span>
+<img src="losttotem.png" alt="Lost Totem" class="totem-image">
+</div>
+<div class="totem-item">
+<span class="totem-counter">x0</span>
+<img src="losttotem.png" alt="Lost Totem" class="totem-image">
+</div>
+<div class="totem-item">
+<span class="totem-counter">x0</span>
+<img src="losttotem.png" alt="Lost Totem" class="totem-image">
+</div>
+<div class="totem-item">
+<span class="totem-counter">x0</span>
+<img src="losttotem.png" alt="Lost Totem" class="totem-image">
+</div>
+<div class="totem-item">
+<span class="totem-counter">x0</span>
+<img src="losttotem.png" alt="Lost Totem" class="totem-image">
+</div>
+<div class="totem-item">
+<span class="totem-counter">x0</span>
+<img src="losttotem.png" alt="Lost Totem" class="totem-image">
+</div>
+<div class="totem-item">
+<span class="totem-counter">x0</span>
+<img src="losttotem.png" alt="Lost Totem" class="totem-image">
+</div>
+</div>
+</div>
+
+<script src="LostCard_test.js"></script> <!-- Подключение JS -->
+</body>
+</html>

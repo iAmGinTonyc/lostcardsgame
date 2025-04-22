@@ -1,0 +1,183 @@
+/* Применение нового шрифта ко всему документу */
+@font-face {
+  font-family: 'FingerPaint';
+  src: url('FingerPaint-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'FjallaOne';
+  src: url('FjallaOne-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* Стиль для body */
+body {
+  margin: 0;
+  font-family: 'FingerPaint', Arial, sans-serif; /* Fallback на Arial, если шрифт не загрузится */
+  background-color: #000;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  overflow: hidden; /* Убираем полосы прокрутки */
+}
+
+/* Стиль для главного контейнера */
+.main-container {
+  position: relative; /* Для абсолютного позиционирования дочерних элементов */
+  width: 100%;
+  height: 100%;
+  overflow: hidden; /* Убираем выход за пределы контейнера */
+}
+
+/* Стиль для изображения */
+#mainmenu {
+  position: absolute; /* Абсолютное позиционирование */
+  top: 0;
+  left: 0;
+  width: 100%; /* Занимает всю ширину экрана */
+  height: 100%; /* Занимает всю высоту экрана */
+  object-fit: cover; /* Растягивает изображение, сохраняя пропорции */
+  z-index: 0; /* Размещение под текстом и кнопками */
+}
+
+/* Стиль для заголовка */
+.title {
+  position: absolute; /* Абсолютное позиционирование */
+  top: 5%; /* Расположение по вертикали (20% от высоты контейнера) */
+  left: 0;
+  right: 0;
+  display: flex; /* Используем flexbox для размещения слов */
+  justify-content: space-between; /* Размещаем слова по краям */
+  padding: 0 20px; /* Отступы слева и справа */
+  z-index: 1; /* Размещение поверх изображения */
+}
+
+/* Общий стиль для частей заголовка */
+.title-part {
+  font-size: 62px; /* Размер текста */
+  font-weight: bold;
+}
+
+/* Стиль для "LOST" */
+.title-lost {
+  position: fixed;
+  left: 15%;
+  text-shadow: 
+  0 5px 0 #ff4d4d, /* Красная тень вправо-вниз */
+  0 4px 8px rgba(0, 0, 0, 0.1); /* Дополнительная темная тень */
+  color: rgba(255, 255, 255, 0.1); /* Белый цвет */
+  animation: fade-in-out 4s infinite; /* Анимация */
+}
+
+/* Стиль для "WOLVES" */
+.title-wolves {
+  position: fixed;
+  right: 15%;
+  text-shadow: 
+  0 5px 0 #ff4d4d, /* Красная тень вправо-вниз */
+  0 4px 8px rgba(0, 0, 0, 0.1); /* Дополнительная темная тень */
+  color: rgba(255, 255, 255, 0.3); /* Белый цвет */
+  animation: fade-in-out 4s infinite; /* Анимация */
+}
+
+/* Анимация изменения прозрачности */
+@keyframes fade-in-out {
+  0%, 100% {
+    color: rgba(255, 255, 255, 0.1); /* Полностью прозрачный */
+  }
+  50% {
+    color: rgba(255, 255, 255, 0.8); /* Полностью непрозрачный */
+  }
+}
+
+/* Стиль для контейнера кнопки */
+.button-container {
+  position: fixed; /* Фиксированное позиционирование */
+  bottom: 30px; /* Отступ снизу */
+  right: 30px; /* Отступ справа */
+  display: flex;
+  align-items: center; /* Выравнивание по вертикали */
+  gap: 40px; /* Увеличенное расстояние между элементами */
+  background-color: #fff; /* Белый фон */
+  border-radius: 22px; /* Закругленные углы */
+  padding: 20px; /* Внутренний отступ для увеличения размера */
+  box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.6); /* Внутренняя тень */
+  z-index: 1; /* Размещение поверх изображения */
+}
+
+/* Стиль для текста "Enter the lost world" */
+.button-text {
+  font-size: 18px;
+  font-weight: bold;
+  color: #000; /* Чёрный текст */
+  white-space: nowrap; /* Запрет переноса текста */
+  text-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.6); /* Верхняя тень для имитации inset */
+}
+
+/* Стиль для кнопки "Collect" */
+#collect-button {
+  padding: 10px 40px; /* Отступы внутри кнопки */
+  background-color: #000; /* Черный фон */
+  color: #fff; /* Белый текст */
+  border: none; /* Убираем границу */
+  border-radius: 32px; /* Закругленные углы */
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease; /* Плавные переходы */
+  box-shadow: 0 4px 8px rgba(255, 255, 255, 0.3); /* Белая тень */
+  font-family: 'FjallaOne', Arial, sans-serif; /* Новый шрифт */
+}
+
+/* Эффект при наведении на кнопку */
+#collect-button:hover {
+  background-color: #ffffff; /* Темно-серый фон */
+  box-shadow: 0 6px 12px rgba(255, 255, 255, 0.5); /* Усиленная тень */
+  color: #000;
+}
+
+/* Стиль для контейнера изображений */
+.image-stack {
+  position: relative; /* Создаем контекст позиционирования */
+  width: 50px; /* Ширина контейнера (основная область) */
+  height: 50px; /* Высота контейнера */
+}
+
+/* Общий стиль для всех изображений */
+.image-stack img {
+  position: absolute; /* Накладываем изображения друг на друга */
+  top: -50px; /* Смещение вверх на 10 пикселей */
+  width: 70px; /* Увеличенный размер изображения */
+  height: auto; /* Сохранение пропорций */
+  border-radius: 6px; /* Закругленные углы (по желанию) */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Тень для объема */
+  transition: opacity 0.3s ease, transform 0.3s ease; /* Плавное изменение прозрачности и позиции */
+  cursor: pointer; /* Меняем курсор на "указатель" */
+}
+
+/* Верхнее изображение (Jack) */
+#jack-image {
+  left: 0;
+}
+
+/* Второе изображение (Queen) */
+#queen-image {
+  left: -10px; /* Сдвигает изображение на 10 пикселей левее */
+}
+
+/* Третье изображение (Jack Sheep) */
+#jacksheep-image {
+  left: -20px; /* Сдвигает изображение на 10 пикселей левее */
+}
+
+/* Четвертое изображение (King) */
+#king-image {
+  left: -30px; /* Сдвигает изображение на 10 пикселей левее */
+}

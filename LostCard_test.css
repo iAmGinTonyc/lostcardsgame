@@ -152,13 +152,15 @@
 /* Содержимое поп-апа */
 .popup-content {
   background: #fff;
-  padding: 20px;
+  padding: 20px; /* Отступы внутри поп-апа */
   border-radius: 12px;
-  width: 95%; /* 95% ширины экрана */
-  height: 95%; /* 95% высоты экрана */
+  width: 95%; /* Ширина поп-апа */
+  height: 95%; /* Высота поп-апа */
   overflow-y: auto; /* Прокрутка, если контент не помещается */
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
   position: relative;
+  display: flex; /* Используем flexbox для управления разметкой */
+  flex-direction: column; /* Размещаем элементы вертикально */
 }
 
 /* Крестик закрытия поп-апа */
@@ -179,40 +181,47 @@
 /* Верхняя часть поп-апа */
 .popup-header {
   background-color: #e0e0e0; /* Серый цвет */
-  padding: 20px;
-  border-radius: 12px 12px 0 0; /* Закругление только верхних углов */
-  text-align: center;
-  font-size: 18px;
+  padding: 20px; /* Общий внутренний отступ */
+  padding-left: 30px; /* Увеличиваем отступ слева (20px общего + 10px дополнительного) */
+  border-radius: 12px 12px 12px 12px; /* Закругление только верхних углов */
+  text-align: left;
+  font-size: 60px;
   font-weight: bold;
   color: #333;
   margin-bottom: 20px; /* Отступ между заголовком и содержимым */
+  width: 100%; /* Ширина на всю доступную область */
 }
 
-/* Галерея выбранных карт внутри поп-апа */
+/* Галерея выбранных карт */
 .selected-cards-gallery {
   display: flex;
-  flex-wrap: wrap;
-  gap: 15px; /* Расстояние между элементами */
+  flex-wrap: wrap; /* Перенос строк при необходимости */
+  gap: 15px; /* Расстояние между карточками */
+  margin-top: 20px; /* Отступ сверху */
+  overflow: hidden; /* Скрываем лишний контент */
 }
 
 /* Контейнер для одной карточки */
 .selected-card-item {
   display: flex;
-  align-items: center; /* Выравниваем по центру */
-  gap: 10px; /* Расстояние между изображением и текстом */
-  width: calc(25% - 20px); /* 4 карточки в строке (25% ширины минус отступы) */
+  align-items: center; /* Выравниваем элементы по центру */
+  gap: 10px; /* Расстояние между элементами */
+  width: 18%; /* Занимает всю доступную ширину */
+  min-width: 300px; /* Минимальная ширина контейнера */
   background-color: #f9f9f9; /* Светлый фон для карточки */
   padding: 10px;
   border-radius: 8px; /* Закругление углов */
   transition: background-color 0.3s; /* Плавное изменение фона */
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Эффект тени */
+  justify-content: space-between; /* Равномерно распределяем элементы */
 }
 
 /* Изображение карточки */
 .selected-card-item img {
-  max-width: 140px; /* Фиксированная ширина изображения */
-  max-height: 140px; /* Фиксированная высота изображения */
-  object-fit: contain; /* Сохраняет пропорции */
+  max-width: 80px; /* Максимальная ширина изображения */
+  max-height: 80px; /* Максимальная высота изображения */
+  object-fit: contain; /* Сохраняем пропорции изображения */
+  flex-shrink: 0; /* Запрещаем уменьшение изображения */
 }
 
 /* Название карточки */
@@ -220,20 +229,157 @@
   flex-grow: 1; /* Занимает всё доступное пространство */
   font-size: 14px;
   color: #333;
-  cursor: pointer;
+  white-space: nowrap; /* Запрещаем перенос текста */
+  overflow: hidden; /* Скрываем текст, если он не помещается */
+  text-overflow: ellipsis; /* Добавляем многоточие для длинного текста */
 }
 
-/* Крестик для удаления карточки */
+/* Крестик для удаления */
 .selected-card-remove {
   font-size: 18px;
   font-weight: bold;
   color: #ff4d4d; /* Красный цвет */
   cursor: pointer;
   transition: color 0.3s; /* Плавное изменение цвета */
+  flex-shrink: 0; /* Запрещаем уменьшение крестика */
 }
 
 .selected-card-remove:hover {
   color: #c22113; /* Темно-красный при наведении */
+}
+/* Стили для правой панели с кнопкой "Craft" */
+.craft-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 13%; /* 13% ширины */
+  height: 100%; /* Полная высота */
+  background-color: #f0f0f0; /* Светлый фон */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end; /* Кнопка внизу */
+  align-items: center;
+  padding-bottom: 20px;
+  box-shadow: -4px 0 8px rgba(0, 0, 0, 0.1); /* Тень слева */
+}
+
+/* Кнопка "Craft" */
+#craft-button {
+  position: relative;
+  display: block;
+  margin-top: 20px;
+  padding: 10px 40px; /* Увеличенные отступы для удобства */
+  background-color: #a71515; /* Красный фон */
+  color: #fff; /* Белый текст */
+  border-radius: 30px; /* Закругление как у кнопки "Selected" */
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold; /* Жирный текст */
+  transition: background-color 0.3s, color 0.3s; /* Плавные переходы */
+  text-align: center; /* Центрируем текст */
+  border: 1.5px solid #a71515; /* Черный ободок */
+}
+
+#craft-button:hover {
+  background-color: #f0f0f0; /* Фон становится белым при наведении */
+  color: #a71515; /* Текст становится красным */
+  border-color: #a71515; /* Ободок остаётся красным */
+}
+
+/* Стили для нового поп-апа "Craft" */
+#craft-popup {
+  display: none; /* Скрыт по умолчанию */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8); /* Полупрозрачный фон */
+  z-index: 2000; /* На переднем плане */
+  justify-content: center;
+  align-items: center;
+}
+
+#craft-popup .popup-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  width: 95%; /* 95% ширины экрана */
+  height: 95%; /* 95% высоты экрана */
+  overflow-y: auto; /* Прокрутка, если контент не помещается */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+/* Стили для контейнера с информацией о крафте */
+.craft-info-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Центрируем содержимое по горизонтали */
+  justify-content: center; /* Центрируем содержимое по вертикали */
+  text-align: center; /* Текст также центрируется */
+  height: 100%; /* Занимает всю высоту поп-апа */
+  padding: 20px; /* Отступы внутри контейнера */
+}
+
+/* Заголовок "YOU selected for craft" */
+.craft-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  position: absolute;
+  bottom: 52%; /* Отступ снизу */
+  transition: color 0.3s; /* Плавный переход цвета */
+}
+
+/* Контейнер для счетчика карт */
+.card-counter-container {
+  font-size: 20px;
+  font-weight: bold;
+  color: #a71515; /* Красный цвет для акцента */
+  position: absolute;
+  bottom: 47%; /* Отступ снизу */
+  transition: color 0.3s; /* Плавный переход цвета */
+}
+
+/* Текст "Are you ready to burn them?" */
+.craft-text {
+  font-size: 18px;
+  color: #666;
+  position: absolute;
+  bottom: 42%; /* Отступ снизу */
+  transition: color 0.3s; /* Плавный переход цвета */
+}
+
+/* Кнопка "BURN" */
+#burn-button {
+  position: absolute;
+  bottom: 35%; /* Отступ снизу */
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 40px;
+  background-color: #a71515; /* Красный фон */
+  color: #fff; /* Белый текст */
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+
+#burn-button:hover {
+  background-color: #fff; /* Фон становится белым при наведении */
+  color: #a71515; /* Текст становится красным */
+}
+/* При наведении на кнопку "BURN" изменяем цвет заголовка */
+#burn-button:hover ~ .craft-title {
+  color: #fff; /* Цвет фона страницы */
+}
+
+/* При наведении на кнопку "BURN" изменяем цвет текста */
+#burn-button:hover ~ .craft-text {
+  color: #fff; /* Цвет фона страницы */
 }
 
 
@@ -290,13 +436,13 @@
   color: #ff4d4d; /* Красный цвет при наведении */
 }
 
-  /* Левая панель с фильтрами */
-  .filters {
-  width: 15%;
+ /* Левая панель с фильтрами */
+ .filters {
+  width: 220px;
   background: #fff;
   padding: 20px;
   box-shadow: 8px 0 16px rgba(0, 0, 0, 0.2); /* Усиленная тень справа */
-  border-radius: 0 12px 12px 0; /* Закругление только правой стороны */
+  border-radius: 0 30px 30px 0; /* Закругление только правой стороны */
   position: fixed; /* Плавающая панель */
   left: 0; /* Прижимаем к левому краю */
   top: 20px; /* Отступ сверху */
@@ -309,7 +455,7 @@
   .status-box {
   background-color: #E9E9E9; /* Серый цвет */
   padding: 15px;
-  border-radius: 0 12px 12px 0; /* Закругление только правой стороны */
+  border-radius: 20px 20px 20px 20px; /* Закругление только правой стороны */
   box-shadow: 8px 0 16px rgba(0, 0, 0, 0.2); /* Тень справа */
   margin-bottom: 20px; /* Отступ между блоком статуса и остальной панелью */
   }
@@ -329,62 +475,173 @@
   }
   
   .filters h2 {
-  margin-bottom: 15px;
-  font-size: 18px;
-  }
-  
-  .filters ul {
-  list-style: none;
-  padding: 0;
-  }
-  
-  .filters li {
-  display: flex;
-  justify-content: space-between; /* Размещаем текст и значок */
-  align-items: center; /* Центрируем содержимое по вертикали */
-  padding: 10px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  }
-  
-  .filters li:hover {
-  background-color: #e0e0e0;
-  }
-  
-  .filter-icon {
-  font-size: 18px;
-  font-weight: bold;
-  transition: transform 0.3s; /* Плавное вращение значка */
-  }
-  
-  /* Стиль для активного состояния (крестик) */
-  .filter-icon.active {
-  transform: rotate(45deg); /* Поворот на 45 градусов */
-  }
-  
-  /* Отображение выбранных рангов */
-  #selected-ranks-container {
-  margin-top: 20px;
-  }
-  
-  .selected-rank-item {
-  background: #f0f0f0;
-  color: #666;
-  padding: 5px 15px;
-  border-radius: 50px;
-  display: inline-block;
-  margin-right: 10px;
   margin-bottom: 10px;
+  font-size: 12px;
+  }
+  
+  /* Список фильтров */
+.filters ul {
+  list-style: none; /* Убираем маркеры списка */
+  padding: 0; /* Убираем отступы */
+  margin: 0; /* Убираем внешние отступы */
+  display: flex; /* Используем flexbox */
+  flex-wrap: wrap; /* Разрешаем перенос элементов на новую строку */
+  gap: 10px; /* Расстояние между элементами */
+}
+
+/* Элементы списка фильтров */
+.filters li {
+  background-color: #f0f0f0;
+  color: #666;
+  padding: 10px 20px; /* Отступы внутри элемента */
+  border: 1px solid #ccc; /* Граница */
+  border-radius: 50px; /* Закругление углов */
+  cursor: pointer; /* Курсор при наведении */
+  transition: all 0.3s; /* Плавный переход */
   font-size: 14px;
+  white-space: nowrap; /* Запрещаем перенос текста */
+}
+
+.filters li:hover {
+  background-color: #e0e0e0; /* Цвет фона при наведении */
+}
+
+/* Активный фильтр */
+.filters #rank-filters li.active {
+  background-color: #a71515;
+  color: #fff;
+  border-color: #a71515;
+}
+/* Стиль для кнопки Login/Register */
+.login-register-button {
+  display: block;
+  margin-top: 15px;
+  padding: 10px 20px;
+  background-color: #a71515; /* Красный фон */
+  color: #fff; /* Белый текст */
+  border: none;
+  border-radius: 30px;
   cursor: pointer;
-  transition: all 0.3s;
-  }
-  
-  .selected-rank-item:hover {
-  background: #d0d0d0;
-  }
-  
-  
+  font-size: 14px;
+  font-weight: bold;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.login-register-button:hover {
+  background-color: #fff; /* Белый фон при наведении */
+  color: #a71515; /* Красный текст */
+}
+
+/* Стили для  поп-апа регистрации/логина */
+#login-register-popup {
+  display: none; /* Скрыт по умолчанию */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%; /* Занимает всю ширину экрана */
+  height: 100%; /* Занимает всю высоту экрана */
+  background-color: rgba(0, 0, 0, 0.8); /* Полупрозрачный фон */
+  z-index: 2000; /* На переднем плане */
+  justify-content: center; /* Центрируем содержимое по горизонтали */
+  align-items: center; /* Центрируем содержимое по вертикали */
+}
+
+#login-register-popup .popup-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  width: 90%; /* Максимальная ширина 90% */
+  max-width: 500px; /* Ограничение максимальной ширины */
+  max-height: 40vh; /* Максимальная высота 40% экрана */
+  overflow-y: auto; /* Добавляем прокрутку, если контент не помещается */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+/* Общий стиль текста для поп-апа */
+#login-register-popup .popup-content,
+#login-register-popup .popup-content * {
+  font-family: 'FingerPaint', Arial, sans-serif; /* Используем шрифт FingerPaint */
+  font-size: 16px; /* Размер шрифта */
+  color: #333; /* Цвет текста */
+  line-height: 1.5; /* Межстрочный интервал */
+}
+
+#login-register-popup .popup-body {
+  text-align: center;
+}
+
+#login-register-popup form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+#login-register-popup label {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+/* Контейнер для поля ввода */
+.input-container {
+  position: relative;
+  width: 100%;
+  max-width: 400px; /* Ограничение ширины */
+  margin-bottom: 20px;
+}
+
+/* Стили для поля ввода */
+.input-container input {
+  width: 100%;
+  padding: 10px;
+  padding-top: 20px; /* Отступ сверху для метки */
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+  outline: none; /* Убираем контур при фокусе */
+  transition: border-color 0.3s;
+}
+
+.input-container input:focus {
+  border-color: #a71515; /* Цвет рамки при фокусе */
+}
+
+/* Стили для плавающей метки */
+.floating-label {
+  position: absolute;
+  top: 50%; /* Начальная позиция по центру */
+  left: 10px;
+  transform: translateY(-50%); /* Центрирование */
+  font-size: 16px;
+  color: #aaa; /* Серый цвет текста */
+  pointer-events: none; /* Метка не должна быть интерактивной */
+  transition: all 0.3s; /* Плавный переход */
+}
+
+/* Анимация метки при фокусе или наличии текста */
+.input-container input:focus + .floating-label,
+.input-container input:not(:placeholder-shown) + .floating-label {
+  top: 0; /* Поднимаем метку наверх */
+  font-size: 12px; /* Уменьшаем размер текста */
+  color: #a71515; /* Изменяем цвет текста */
+}
+
+#login-register-popup button[type="submit"] {
+  padding: 10px;
+  background-color: #ffffff;
+  color: #000000;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+#login-register-popup button[type="submit"]:hover {
+  text-decoration: underline;
+}  
+
   /* Центральная галерея карт */
   .gallery {
   width: calc(70% - 20px); /* Ширина центральной галереи (оставшееся пространство) */
@@ -399,12 +656,10 @@
   font-size: 4rem; /* Увеличиваем шрифт (в два раза больше обычного) */
   font-weight: bold;
   text-align: center; /* Центрируем текст */
-  margin-bottom: 30px; /* Добавляем отступ снизу */
-  background: linear-gradient(to top, #ffffff, #000000); /* Градиент: белый снизу, чёрный сверху */
-  -webkit-background-clip: text; /* Применяем градиент к тексту */
+  margin-bottom: 10px; /* Добавляем отступ снизу */
   background-clip: text;
-  color: transparent; /* Делаем текст прозрачным, чтобы был виден градиент */
   text-transform: uppercase; /* Верхний регистр */
+  cursor: pointer; /* Показывает курсор "рука", чтобы подсказать, что элемент кликабелен */
   }
   
   /* Горизонтальная полоса */
@@ -421,16 +676,16 @@
   top: 27px; /* Прилипает к верху экрана */
   display: flex;
   justify-content: center;
-  gap: 40px;
+  gap: 8%;
   margin-bottom: 20px;
   z-index: 1000;
   }
   
   .suit-filter-column div {
-  background: #f0f0f0;
+  background: #fff;
   color: #333;
-  padding: 10px 20px;
-  border: 1px solid #ccc;
+  padding: 2px 35px;
+  border: 1px solid #fff;
   border-radius: 50px;
   cursor: pointer;
   transition: all 0.3s;
@@ -457,7 +712,7 @@
   /* Общий стиль для карточек */
 .card {
   position: relative;
-  width: 90%;
+  width: 100%;
   height: 100%; /* Фиксированная высота карточки */
   filter: blur(1.5px); /* Размытие по умолчанию */
   transition: all 0.3s ease; /* Плавный переход */
@@ -466,14 +721,14 @@
 }
 .card:hover {
   filter: blur(0); /* Убираем размытие */
-  transform: scale(1.1); /* Увеличиваем на 10% */
+  transform: scale(1.05); /* Увеличиваем на 10% */
   z-index: 1; /* Поднимаем карточку выше остальных */
   transition: all 0.3s ease; /* Плавный переход */
 }
 
 .card.selected {
   filter: blur(0); /* Убираем размытие */
-  transform: scale(1.05); /* Увеличиваем на 5% */
+  transform: scale(1.03); /* Увеличиваем на 5% */
   z-index: 1; /* Поднимаем карточку выше остальных */
   position: relative; /* Нужно для позиционирования эффекта искр */
 }
@@ -578,12 +833,12 @@
   
   /* Правая панель */
   .right-panel {
-  width: 15%;
+  width: 180px;
   background: #000; /* Чёрный фон */
   color: #fff; /* Белый текст */
   padding: 20px;
   box-shadow: -8px 0 16px rgba(0, 0, 0, 0.2); /* Тень слева */
-  border-radius: 12px 0 0 12px; /* Закругление только левой стороны */
+  border-radius: 30px 0 0 30px; /* Закругление только левой стороны */
   position: fixed; /* Фиксированная позиция */
   right: 0; /* Прижимаем к правому краю */
   top: 20px; /* Отступ сверху */
@@ -607,7 +862,7 @@
   .totem-item {
   display: flex;
   align-items: center; /* Выравниваем по вертикали */
-  gap: 30px; /* Расстояние между счетчиком и картинкой */
+  gap: 0px; /* Расстояние между счетчиком и картинкой */
   margin-bottom: 20px;
   }
   
@@ -623,34 +878,5 @@
   height: 100px; /* Высота картинки */
   object-fit: contain; /* Сохраняем пропорции картинки */
   }
-  
-  /* Эффект огня */
-.fire-effect {
-  position: relative;
-  overflow: hidden;
-}
 
-.fire-effect::before {
-  content: "";
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(circle, rgba(255, 96, 0, 0.8), transparent);
-  transform: translateX(-50%) translateY(-50%);
-  filter: blur(10px);
-  animation: fire-animation 0.8s infinite alternate;
-  z-index: -1;
-}
 
-@keyframes fire-animation {
-  0% {
-    transform: translateX(-50%) translateY(-50%) scale(1);
-    opacity: 0.8;
-  }
-  100% {
-    transform: translateX(-50%) translateY(-80%) scale(1.2);
-    opacity: 0.4;
-  }
-}
