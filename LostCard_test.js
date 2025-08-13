@@ -61,6 +61,25 @@ const cards = [
   { rank: "joker-black", suit: "jokers", image: "jokers/joker-black.png", description: "This is a Black Joker" },
 ];
 
+// Сокращения для мастей
+const suitShort = {
+  spades: "S",
+  hearts: "H",
+  clubs: "C",
+  diamonds: "D",
+  jokers: "J"
+};
+
+// Цвета для счётчиков мастей (по умолчанию чёрный, кроме червей)
+const suitColor = {
+  spades: "#000",
+  hearts: "#a71515", // красный
+  clubs: "#000",
+  diamonds: "#a71515", // красный
+  "joker-red": "#a71515",
+  "joker-black": "#000"
+};
+
 // Массив выбранных карт
 let selectedCards = [];
 // Массив выбранных рангов
@@ -81,6 +100,16 @@ function saveData() {
   localStorage.setItem("selectedCards", JSON.stringify(selectedCards));
 }
 
+// Пример структуры данных, которые придут из базы
+// let userCardData = {
+//   "2": { hearts: 1, spades: 0, clubs: 2, diamonds: 1 },
+//   "3": { hearts: 0, spades: 2, clubs: 1, diamonds: 0 },
+//   ...
+//   "joker-red": 1,
+//   "joker-black": 1
+// };
+// Позже использовать: userCardData[card.rank][card.suit]
+
 // Функция для отображения карт
 function displayCards(filteredCards) {
   const gallery = document.getElementById("card-gallery");
@@ -92,6 +121,9 @@ function displayCards(filteredCards) {
 
     const cardDiv = document.createElement("div");
     cardDiv.classList.add("card");
+    // Добавляем data-атрибуты для идентификации карты
+    cardDiv.dataset.rank = card.rank;
+    cardDiv.dataset.suit = card.suit;
 
     const img = document.createElement("img");
     img.src = card.image;
@@ -101,32 +133,48 @@ function displayCards(filteredCards) {
     // Проверяем, выбрана ли карта
     const cardKey = `${card.rank} of ${card.suit}`;
     if (selectedCards.includes(cardKey)) {
-      cardDiv.classList.add("selected"); // Добавляем класс "selected"
+      cardDiv.classList.add("selected");
+      // Если карта уже выбрана, создаем счетчик
+      setTimeout(() => {
+        if (!cardDiv.querySelector('.counter')) {
+          createCounter(cardDiv);
+        }
+      }, 0);
     }
 
-
-    
-    // Добавляем обработчик клика для выбора/снятия выбора
-    cardDiv.addEventListener("click", () => {
-      const cardKey = `${card.rank} of ${card.suit}`;
-      const index = selectedCards.indexOf(cardKey);
-      if (index === -1) {
-        selectedCards.push(cardKey); // Добавляем карту в массив
-        cardDiv.classList.add("selected"); // Добавляем класс "selected"
-      } else {
-        selectedCards.splice(index, 1); // Удаляем карту из массива
-        cardDiv.classList.remove("selected"); // Убираем класс "selected"
+    // Добавляем обработчик клика только для создания счетчика
+    cardDiv.addEventListener("click", (event) => {
+      // Проверяем, не кликнули ли по счетчику
+      if (!event.target.closest('.counter')) {
+        // Проверяем, есть ли уже счетчик
+        if (!cardDiv.querySelector('.counter')) {
+          // Добавляем карту в selectedCards если её там нет
+          if (!selectedCards.includes(cardKey)) {
+            selectedCards.push(cardKey);
+            updateSelectedCounter();
+            saveData();
+            updateSelectedCardsPopup(); // Обновляем попап
+          }
+          createCounter(cardDiv);
+        }
       }
-
-      updateSelectedCounter(); // Обновляем счетчик
-      saveData(); // Сохраняем данные
     });
 
-
     // Добавляем подпись под картой
+    const existingLabel = cardItem.querySelector('.card-label');
+    if (existingLabel) existingLabel.remove();
+
+    // Показываем название карты
     const cardLabel = document.createElement("div");
     cardLabel.classList.add("card-label");
     cardLabel.textContent = `${card.rank} of ${card.suit}`;
+
+    // Создаём и добавляем счётчик количества этой конкретной карты
+    const countBadge = document.createElement("div");
+    countBadge.classList.add("card-count-badge");
+    // Заглушка: 1 для всех карт. Позже будет браться из базы данных
+    countBadge.textContent = "1"; // ← сюда подставится значение из БД, например: userData[card.rank][card.suit] || 0
+    cardItem.appendChild(countBadge);
 
     // Открываем модальное окно при клике на подпись
     cardLabel.addEventListener("click", (event) => {
@@ -139,155 +187,281 @@ function displayCards(filteredCards) {
   });
 }
 
-// Функция для открытия модального окна
-function openModal(description, event) {
-  const modal = document.getElementById("modal-description");
-  const modalText = document.getElementById("modal-text");
-  const overlay = document.querySelector(".overlay");
-
-  modalText.textContent = description;
-
-  const clickX = event.pageX;
-  const clickY = event.pageY;
-  modal.style.left = `${clickX + 10}px`;
-  modal.style.top = `${clickY + 10}px`;
-
-  modal.style.display = "block";
-  overlay.style.display = "block";
+// Функция для создания счетчика
+function createCounter(cardElement) {
+  // Проверяем, есть ли уже счетчик
+  if (cardElement.querySelector('.counter')) {
+    return;
+  }
+  const counterHtml = `
+    <div class="counter">
+      <div class="cross-btn minus">
+        <div class="cross vertical"></div>
+        <div class="cross horizontal"></div>
+      </div>
+      <span class="counter-value">1</span>
+      <div class="cross-btn plus">
+        <div class="cross vertical"></div>
+        <div class="cross horizontal"></div>
+      </div>
+    </div>
+  `;
+  cardElement.insertAdjacentHTML('beforeend', counterHtml);
+  cardElement.classList.add('selected');
+  const counter = cardElement.querySelector('.counter');
+  const valueElement = counter.querySelector('.counter-value');
+  const minusBtn = counter.querySelector('.minus');
+  const plusBtn = counter.querySelector('.plus');
+  // Обработчики событий для кнопок
+  minusBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    let value = parseInt(valueElement.textContent);
+    if (value > 0) {
+      value--;
+      valueElement.textContent = value;
+      // Обновляем общий счетчик
+      updateTotalScore(-1);
+      // Если счетчик стал 0, удаляем его и карту из selected
+      if (value === 0) {
+        setTimeout(() => {
+          counter.remove();
+          cardElement.classList.remove('selected'); // Возвращаем карту в состояние не выбранности
+          // Удаляем карту из selectedCards
+          const cardKey = getCardKeyFromElement(cardElement);
+          if (cardKey) {
+            const index = selectedCards.indexOf(cardKey);
+            if (index !== -1) {
+              selectedCards.splice(index, 1);
+              updateSelectedCounter();
+              saveData();
+              updateSelectedCardsPopup(); // Обновляем попап
+            }
+          }
+        }, 100);
+      }
+    }
+  });
+  plusBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    let value = parseInt(valueElement.textContent);
+    value++;
+    valueElement.textContent = value;
+    // Обновляем общий счетчик
+    updateTotalScore(1);
+  });
 }
 
-// Функция для закрытия модального окна
-function closeModal() {
-  const modal = document.getElementById("modal-description");
-  const overlay = document.querySelector(".overlay");
-
-  modal.style.display = "none";
-  overlay.style.display = "none";
+// Вспомогательная функция для получения ключа карты из элемента
+function getCardKeyFromElement(cardElement) {
+  const rank = cardElement.dataset.rank;
+  const suit = cardElement.dataset.suit;
+  if (rank && suit) {
+    return `${rank} of ${suit}`;
+  }
+  return null;
 }
 
-document.querySelector("#modal-description .close-container").addEventListener("click", () => {
-  closeModal();
-});
+// Функция для обновления общего счетчика
+function updateTotalScore(change) {
+  // Здесь можно добавить логику для общего счетчика, если нужно
+  // Пока оставляем пустой, но можно реализовать при необходимости
+}
 
-// Функция для применения фильтров
+// Функция для обновления попапа с выбранными картами
+function updateSelectedCardsPopup() {
+  const gallery = document.getElementById("selected-cards-gallery");
+  if (!gallery) return;
+
+  // Очищаем галерею
+  gallery.innerHTML = "";
+
+  // Отображаем выбранные карты
+  selectedCards.forEach((cardKey) => {
+    const cardData = cards.find((card) => `${card.rank} of ${card.suit}` === cardKey);
+    if (cardData) {
+      const cardItem = document.createElement("div");
+      cardItem.classList.add("selected-card-item");
+
+      // Изображение карточки
+      const img = document.createElement("img");
+      img.src = cardData.image;
+      img.alt = `Card ${cardData.rank} of ${cardData.suit}`;
+
+      // Название карточки
+      const cardName = document.createElement("div");
+      cardName.classList.add("selected-card-name");
+      cardName.textContent = `${cardData.rank} of ${cardData.suit}`;
+
+      // Крестик для удаления
+      const removeButton = document.createElement("span");
+      removeButton.classList.add("selected-card-remove");
+      removeButton.textContent = "×";
+      removeButton.addEventListener("click", () => {
+        const index = selectedCards.indexOf(cardKey);
+        if (index !== -1) {
+          // Удаляем карточку из массива
+          selectedCards.splice(index, 1);
+
+          // Находим соответствующую карточку в галерее и удаляем счетчик
+          const cardInGallery = document.querySelector(
+            `.card[data-rank="${cardData.rank}"][data-suit="${cardData.suit}"]`
+          );
+          if (cardInGallery) {
+            const counter = cardInGallery.querySelector('.counter');
+            if (counter) {
+              counter.remove();
+            }
+            cardInGallery.classList.remove("selected");
+          }
+
+          // Удаляем карточку из DOM поп-апа
+          cardItem.remove();
+
+          // Обновляем счетчик выбранных карт
+          updateSelectedCounter();
+
+          // Сохраняем данные
+          saveData();
+        }
+      });
+
+      cardItem.appendChild(img);
+      cardItem.appendChild(cardName);
+      cardItem.appendChild(removeButton);
+      gallery.appendChild(cardItem);
+    }
+  });
+}
+
+// Функция для открытия поп-апа с выбранными картами
+function openSelectedCardsPopup() {
+  const popup = document.getElementById("selected-cards-popup");
+  updateSelectedCardsPopup(); // Обновляем содержимое попапа
+  // Показываем поп-ап
+  if (popup) {
+    popup.style.display = "flex";
+  }
+}
+
+
 function applyFilters() {
   let filteredCards = cards;
 
-  // Фильтрация по рангам
-  if (selectedRanks.size > 0) {
+  document.querySelectorAll("#rank-filters li[data-rank]").forEach(li => {
+    const rank = li.getAttribute("data-rank");
+    if (rank === "all") return;
+
+    const isActive = selectedRanks.has(rank);
+
+    // Пример данных (позже — из userCardData)
+    const counts = { spades: 1, hearts: 1, clubs: 1, diamonds: 1, "joker-red": 1, "joker-black": 1 };
+    if (rank === "2") Object.assign(counts, { spades: 0, hearts: 3, clubs: 0, diamonds: 1 });
+    if (rank === "ace") Object.assign(counts, { spades: 2, hearts: 0, clubs: 1, diamonds: 0 });
+    if (rank === "jokers") Object.assign(counts, { "joker-red": 1, "joker-black": 1 });
+
+    const total = Object.values(counts).reduce((a, b) => a + b, 0);
+
+// Формируем строку с мастями
+let suitText = "";
+if (rank === "jokers") {
+  suitText = `
+    <span style="color:${suitColor["joker-red"]}">${counts["joker-red"]}R</span>
+    <span style="color:${suitColor["joker-black"]}">${counts["joker-black"]}B</span>
+  `.trim();
+} else {
+  suitText = [
+    `<span style="color:${suitColor.spades}">${counts.spades}${suitShort.spades}</span>`,
+    `<span style="color:${suitColor.hearts}">${counts.hearts}${suitShort.hearts}</span>`,
+    `<span style="color:${suitColor.clubs}">${counts.clubs}${suitShort.clubs}</span>`,
+    `<span style="color:${suitColor.diamonds}">${counts.diamonds}${suitShort.diamonds}</span>`
+  ].join(" ");
+}
+
+    // Словарь названий
+    const rankNames = {
+      "2": "Two", "3": "Three", "4": "Four", "5": "Five", "6": "Six",
+      "7": "Seven", "8": "Eight", "9": "Nine", "10": "Ten",
+      jack: "Jack", queen: "Queen", king: "King", ace: "Ace", jokers: "Jokers"
+    };
+    const rankName = rankNames[rank];
+
+    // Инициализация DOM-структуры при первом запуске
+    if (!li.dataset.initialized) {
+      li.innerHTML = `
+        <span class="suits-count">${suitText}</span>
+        <span class="rank-name">${rankName}</span>
+        <span class="rank-count">${total}</span>
+      `;
+      li.dataset.initialized = "true";
+    }
+
+    // Обновляем данные
+    const suitsCountEl = li.querySelector(".suits-count");
+    const rankNameEl = li.querySelector(".rank-name");
+    const rankCountEl = li.querySelector(".rank-count");
+
+    if (suitsCountEl) suitsCountEl.innerHTML = suitText;
+    if (rankCountEl) rankCountEl.textContent = total;
+
+    // Переключаем класс
+    if (isActive) {
+      li.classList.add("active");
+    } else {
+      li.classList.remove("active");
+    }
+  });
+
+  // Фильтрация карт
+  if (selectedRanks.size > 0 && !selectedRanks.has("all")) {
     if (selectedRanks.has("selected")) {
-      // Если выбран фильтр "Selected", показываем только выбранные карты
       filteredCards = filteredCards.filter(card =>
         selectedCards.includes(`${card.rank} of ${card.suit}`)
       );
     } else {
-      // Обработка джокеров и других рангов
       filteredCards = filteredCards.filter(card => {
-        const isJoker = card.suit === "jokers"; // Проверка, является ли карта джокером
+        const isJoker = card.suit === "jokers";
         return (
-          (selectedRanks.has("jokers") && isJoker) || // Показываем джокеров, если они выбраны
-          (!isJoker && selectedRanks.has(card.rank)) // Показываем другие карты, если их ранг выбран
+          (selectedRanks.has("jokers") && isJoker) ||
+          (!isJoker && selectedRanks.has(card.rank))
         );
       });
     }
   }
 
-  // Фильтрация по мастям
-  if (currentSuit !== "all") {
-    filteredCards = filteredCards.filter(card => card.suit === currentSuit);
-  }
-
-  // Отображаем отфильтрованные карты
   displayCards(filteredCards);
 }
 
-// Обработчик кликов на фильтры по рангу
+
+
 document.querySelector("#rank-filters").addEventListener("click", (event) => {
   const target = event.target;
-  if (target.tagName === "LI") {
-    const rank = target.getAttribute("data-rank");
-    if (rank === "all") {
-      selectedRanks.clear();
-    } else {
-      if (selectedRanks.has(rank)) {
-        selectedRanks.delete(rank);
-      } else {
-        selectedRanks.add(rank);
-      }
-    }
-    applyFilters();
-    updateSelectedRanksDisplay();
-    saveData();
-    // Визуальная подсветка активных фильтров
-    document.querySelectorAll("#rank-filters li").forEach(item => {
-      item.classList.toggle("active", selectedRanks.has(item.getAttribute("data-rank")));
-    });
-  }
-});
+  const rankLi = target.closest("li[data-rank]");
+  
+  if (!rankLi) return;
+  
+  const rank = rankLi.getAttribute("data-rank");
 
-// Открытие поп-апа Login/Register
-document.getElementById("login-register-button").addEventListener("click", () => {
-  const popup = document.getElementById("login-register-popup");
-  popup.style.display = "flex"; // Показываем поп-ап
-});
-
-// Закрытие поп-апа при нажатии на крестик
-document.querySelector("#login-register-popup .close-popup").addEventListener("click", () => {
-  const popup = document.getElementById("login-register-popup");
-  popup.style.display = "none"; // Скрываем поп-ап
-});
-
-// Закрытие поп-апа при клике вне его области
-document.getElementById("login-register-popup").addEventListener("click", (event) => {
-  if (event.target === event.currentTarget) {
-    const popup = document.getElementById("login-register-popup");
-    popup.style.display = "none"; // Скрываем поп-ап
-  }
-});
-
-// Обработка отправки формы
-document.getElementById("login-register-form").addEventListener("submit", (event) => {
-  event.preventDefault(); // Предотвращаем отправку формы
-  const username = document.getElementById("username").value;
-  const password = document.getElementById("password").value;
-
-  // Пример обработки данных
-  console.log("Username:", username);
-  console.log("Password:", password);
-
-  // Закрываем поп-ап после отправки
-  const popup = document.getElementById("login-register-popup");
-  popup.style.display = "none";
-
-  // Очищаем форму
-  event.target.reset();
-});
-
-// Обработчик кликов на фильтры по мастям
-document.querySelectorAll(".suit-filter-column div").forEach(filter => {
-  filter.addEventListener("click", () => {
-    const suit = filter.getAttribute("data-suit");
-
-    // Если текущая масть уже выбрана, сбрасываем фильтр на "all"
-    if (currentSuit === suit) {
-      currentSuit = "all";
-      document.querySelectorAll(".suit-filter-column div").forEach(div => {
-        div.classList.remove("active"); // Убираем подсветку всех кнопок
-      });
-    } else {
-      // Иначе выбираем новую масть
-      currentSuit = suit;
-      document.querySelectorAll(".suit-filter-column div").forEach(div => {
-        div.classList.remove("active"); // Убираем подсветку всех кнопок
-      });
-      filter.classList.add("active"); // Подсвечиваем выбранную кнопку
-    }
-
-    // Применяем фильтры и сохраняем данные
+  if (rank === "all") {
+    selectedRanks.clear();
     applyFilters();
     saveData();
-  });
+    return;
+  }
+
+  if (!target.classList.contains("rank-name") && !target.closest(".rank-name")) {
+    return;
+  }
+
+  if (selectedRanks.has(rank)) {
+    selectedRanks.delete(rank);
+  } else {
+    selectedRanks.add(rank);
+  }
+
+  applyFilters();
+  saveData();
 });
+
 
 // Функция для отображения выбранных рангов
 function updateSelectedRanksDisplay() {
@@ -362,6 +536,8 @@ function openSelectedCardsPopup() {
       cardName.classList.add("selected-card-name");
       cardName.textContent = `${cardData.rank} of ${cardData.suit}`;
 
+      
+
       // Крестик для удаления
       const removeButton = document.createElement("span");
       removeButton.classList.add("selected-card-remove");
@@ -403,7 +579,7 @@ function openSelectedCardsPopup() {
   popup.style.display = "flex";
 }
 
-/// Функция для анимации счетчика
+/// Функция для анимации счетчика выбранных карт для крафта
 function animateCounter(element, targetValue, duration = 1000) {
   let start = 0; // Начальное значение
   const stepTime = 100; // Время между шагами (в миллисекундах)
@@ -488,58 +664,111 @@ document.getElementById("mint-popup").addEventListener("click", (event) => {
   }
 });
 
-// Получаем ссылки на элементы
-const emailInput = document.getElementById("email");
-const passwordInput = document.getElementById("password");
-const emailLabel = document.getElementById("email-label");
-const passwordLabel = document.getElementById("password-label");
-
-// Функция для скрытия метки при фокусе
-function hideLabel(input, label) {
-  input.addEventListener("focus", () => {
-    label.style.display = "none"; // Скрываем метку
-  });
+// Функция для анимации убывания счетчика оставшихся для минта карт
+function startCountdown() {
+  const counterElement = document.getElementById('card-counter');
+  let count = 52; // Начальное значение (можно загрузить из базы данных)
+  
+  // Указание значения из базы данных (замените на реальный запрос к БД)
+  // Пример: count = await fetchCounterFromDatabase();
+  
+  const interval = setInterval(() => {
+    if (count > 2) { // Уменьшаем до 2 (конечное значение)
+      count--;
+      counterElement.textContent = count;
+    } else {
+      clearInterval(interval); // Останавливаем интервал
+    }
+  }, 60); // Интервал в миллисекундах (скорость анимации)
 }
 
-// Функция для показа метки, если поле пустое
-function showLabelIfEmpty(input, label) {
-  input.addEventListener("blur", () => {
-    if (!input.value.trim()) {
-      label.style.display = "block"; // Показываем метку, если поле пустое
+// Функция для обновления таймера
+function startTimer(duration, display) {
+  let timer = duration, hours, minutes, seconds;
+  const interval = setInterval(() => {
+    hours = parseInt(timer / 3600, 10);
+    minutes = parseInt((timer % 3600) / 60, 10);
+    seconds = parseInt(timer % 60, 10);
+
+    hours = hours < 10 ? "0" + hours : hours;
+    minutes = minutes < 10 ? "0" + minutes : minutes;
+    seconds = seconds < 10 ? "0" + seconds : seconds;
+
+    display.textContent = hours + ":" + minutes + ":" + seconds;
+
+    if (--timer < 0) {
+      timer = duration; // Сброс таймера, если он закончился
+    }
+  }, 1000);
+}
+
+// Запуск анимации при открытии поп-апа минта
+document.addEventListener('DOMContentLoaded', () => {
+  const popup = document.getElementById('mint-popup');
+  popup.style.display = 'flex'; // Показываем поп-ап
+  startCountdown(); // Запускаем анимацию счетчика
+
+  // Устанавливаем начальное значение таймера (2 часа 39 минут)
+  const duration = 2 * 3600 + 39 * 60; // 2 часа и 39 минут в секундах
+  const display = document.getElementById('timer');
+  startTimer(duration, display); // Запускаем таймер
+});
+
+// Функция для открытия поп-апа Withdraw/Deposit
+function openWithdrawDepositPopup(buttonType) {
+  const popup = document.getElementById("Withdraw-Deposit-popup");
+  popup.style.display = "flex"; // Показываем поп-ап
+  const popupBody = popup.querySelector(".popup-body");
+  // Создаем содержимое поп-апа
+  const popupContent = `
+    <div class="popup-title">${buttonType === 'deposit' ? 'Deposit' : 'Withdraw'}</div>
+    <div class="form-container">
+      <input type="number" class="input-field" placeholder="Enter amount" id="amount-input">
+      <div class="action-buttons">
+        <button id="${buttonType}-button">${buttonType === 'deposit' ? 'Deposit' : 'Withdraw'}</button>
+      </div>
+    </div>
+  `;
+  popupBody.innerHTML = popupContent;
+
+  // Обработчик события для кнопки Deposit или Withdraw
+  document.getElementById(`${buttonType}-button`).addEventListener("click", () => {
+    const amountInput = document.getElementById("amount-input");
+    const amount = parseFloat(amountInput.value);
+    if (amount > 0) {
+      alert(`${buttonType.charAt(0).toUpperCase() + buttonType.slice(1)}: ${amount}`);
+      // Здесь можно добавить логику для депозита или вывода средств
     }
   });
 }
 
-// Применяем функции к полям ввода
-hideLabel(emailInput, emailLabel);
-showLabelIfEmpty(emailInput, emailLabel);
+// Функция для закрытия поп-апа Withdraw/Deposit
+function closeWithdrawDepositPopup() {
+  const popup = document.getElementById("Withdraw-Deposit-popup");
+  popup.style.display = "none"; // Скрываем поп-ап
+}
 
-hideLabel(passwordInput, passwordLabel);
-showLabelIfEmpty(passwordInput, passwordLabel);
-
-// Пример проверки ввода полей регистрации
-document.getElementById("login-register-form").addEventListener("submit", (event) => {
-  event.preventDefault(); // Предотвращаем отправку формы
-
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-
-  if (!email || !password) {
-    alert("Please fill in both fields.");
-    return;
-  }
-
-  console.log("Email:", email);
-  console.log("Password:", password);
-
-  // Закрываем поп-ап после отправки
-  const popup = document.getElementById("login-register-popup");
-  popup.style.display = "none";
-
-  // Очищаем форму
-  event.target.reset();
+// Обработчик кликов на кнопку Deposit в левой панели
+document.getElementById("Withdraw-Deposit-button").addEventListener("click", () => {
+  openWithdrawDepositPopup('deposit');
 });
 
+// Обработчик кликов на кнопку Withdraw в нижней панели поп-апа для выбранных карт
+document.getElementById("Withdraw-Deposit-button-in-craft").addEventListener("click", () => {
+  openWithdrawDepositPopup('withdraw');
+});
+
+// Закрытие поп-апа Withdraw/Deposit при нажатии на крестик
+document.querySelector("#Withdraw-Deposit-popup .close-popup").addEventListener("click", () => {
+  closeWithdrawDepositPopup();
+});
+
+// Закрытие поп-апа Withdraw/Deposit при клике вне его области
+document.getElementById("Withdraw-Deposit-popup").addEventListener("click", (event) => {
+  if (event.target === event.currentTarget) {
+    closeWithdrawDepositPopup();
+  }
+});
 
 // Инициализация страницы
 loadSavedData();
