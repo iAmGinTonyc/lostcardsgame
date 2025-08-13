@@ -160,30 +160,35 @@ function displayCards(filteredCards) {
       }
     });
 
-    // Добавляем подпись под картой
-    const existingLabel = cardItem.querySelector('.card-label');
-    if (existingLabel) existingLabel.remove();
+// === КОНТЕЙНЕР ДЛЯ ПОДПИСИ И СЧЁТЧИКА ===
+const labelContainer = document.createElement("div");
+labelContainer.classList.add("card-label-container");
 
-    // Показываем название карты
-    const cardLabel = document.createElement("div");
-    cardLabel.classList.add("card-label");
-    cardLabel.textContent = `${card.rank} of ${card.suit}`;
+// Показываем название карты
+const cardLabel = document.createElement("div");
+cardLabel.classList.add("card-label");
+cardLabel.textContent = `${card.rank} of ${card.suit}`;
 
-    // Создаём и добавляем счётчик количества этой конкретной карты
-    const countBadge = document.createElement("div");
-    countBadge.classList.add("card-count-badge");
-    // Заглушка: 1 для всех карт. Позже будет браться из базы данных
-    countBadge.textContent = "1"; // ← сюда подставится значение из БД, например: userData[card.rank][card.suit] || 0
-    cardItem.appendChild(countBadge);
+// Обработчик клика на подпись
+cardLabel.addEventListener("click", (event) => {
+  event.stopPropagation(); // Чтобы не срабатывало на карточку
+  openModal(card.description, event);
+});
 
-    // Открываем модальное окно при клике на подпись
-    cardLabel.addEventListener("click", (event) => {
-      openModal(card.description, event);
-    });
+// Счётчик количества
+const countBadge = document.createElement("div");
+countBadge.classList.add("card-count-badge");
+countBadge.textContent = "х2"; // ← потом из БД
 
-    cardItem.appendChild(cardDiv);
-    cardItem.appendChild(cardLabel);
-    gallery.appendChild(cardItem);
+// Добавляем в контейнер
+labelContainer.appendChild(cardLabel);
+labelContainer.appendChild(countBadge);
+
+// === ФОРМИРУЕМ ПОРЯДОК ДОБАВЛЕНИЯ ===
+cardItem.appendChild(cardDiv);           // Картинка
+cardItem.appendChild(labelContainer);    // Подпись + счётчик
+gallery.appendChild(cardItem);
+// =====================================
   });
 }
 
