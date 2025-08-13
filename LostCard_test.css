@@ -827,12 +827,14 @@
   }
   
   .card-item {
-    position: relative;
-    width: calc(25% - 12px);
-    text-align: center;
-    margin-top: 13px;
+    width: calc(25% - 12px); /* 4 карты в строке */
+    text-align: center; /* ← Центрирует содержимое по горизонтали */
+    margin-top: 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* ← Ключевое: центрирует дочерние элементы */
+    gap: 2px; /* Отступ между карточкой и подписью */
   }
-  
   /* Общий стиль для карточек */
 .card {
   position: relative;
@@ -961,32 +963,28 @@
   object-fit: contain; /* Сохраняет пропорции изображения */
   transition: transform 0.3s ease; /* Плавный переход для изображения */
   }
-  
+ 
+  .card-label-container {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    color: #333;
+    gap: 8px;
+  }
+
   /* Подпись под картой */
   .card-label {
-  font-size: 14px; /* Меньший шрифт */
-  margin-top: -5px;
-  color: #333;
-  cursor: pointer;
-  text-transform: capitalize;
+    font-size: 14px; /* Меньший шрифт */
+    margin-top: -5px;
+    color: #333;
+    cursor: pointer;
+    text-transform: capitalize;
   }
   
 /* Счётчик под карточкой — количество этой конкретной карты */
 .card-count-badge {
-  position: absolute;
-  bottom: 5px;
-  right: 8px;
-  background-color: #000;
-  color: #fff;
-  font-size: 12px;
-  font-weight: bold;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  color: #000000;
+  font-size: 18px;
 }
 
   /* Overlay to block interaction with the rest of the page */
