@@ -24,9 +24,25 @@
         <img id="jack-image" src="jack_mainmenu.png" alt="Jack">
     
       </div>
-      <button id="collect-button">Collect</button>
+      <button id="login-register-button">Login/Register</button>
     </div>
   </div>
+
+ <!-- Поп-ап окно -->
+<div id="popup" class="popup">
+  <div class="popup-content">
+    <span id="close-popup" class="close-popup">&times;</span>
+    <form id="auth-form">
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" required placeholder="Enter your email">
+
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" required placeholder="Enter your password">
+
+      <button type="submit">Login / Registration</button>
+    </form>
+  </div>
+</div>
 
   <script src="main.js"></script> <!-- Подключение JS -->
 </body>
