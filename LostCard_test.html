@@ -10,176 +10,179 @@
 <!-- Overlay to block interaction -->
 <div class="overlay"></div>
 
-<!-- Modal window for card description -->
-<div id="modal-description" class="modal">
-<div class="close-container">
-<span class="close-text">Close</span>
-<div class="close-icon"></div>
-</div>
-<p id="modal-text"></p>
-</div>
-
 <!-- Новая нижняя панель -->
 <div class="bottom-panel">
-<button id="deselect-all-cards">Deselect All Cards</button>
-<button id="selected-cards-button">
-  Selected
-  <div id="selected-counter">0</div> <!-- Счетчик выбранных карт -->
-</button>
-<button id="mint-button">Mint</button> <!-- Новая кнопка "Mint" -->
-</div>
+  <button id="deselect-all-cards">Deselect All Cards</button>
+  <button id="selected-cards-button">
+    Selected
+    <div id="selected-counter">0</div> <!-- Счетчик выбранных карт -->
+  </button>
+  <button id="mint-button">Mint</button> <!-- Новая кнопка "Mint" -->
 </div>
 
-<!-- Поп-ап для Mint -->
-<div id="mint-popup" class="popup">
+<!-- Минт попап -->
+<div id="mint-popup">
   <div class="popup-content">
-    <div class="popup-header">MINT</div>
-    <p>Вы нажали кнопку Mint!</p>
+    
+    <!-- Крестик — поверх, позиционируется отдельно -->
     <span class="close-popup">&times;</span>
+
+    <!-- Основное содержимое — два блока: слева и справа -->
+    <div class="mint-title-container">
+      <div class="popup-title">MINT</div>
+    </div>
+    
+    <div class="mint-details-container">
+      <div class="counter-container">
+        <div class="popup-text">Cards left:</div>
+        <div class="counter" id="card-counter">52</div>
+      </div>
+      <div class="minted-container">
+        <div class="popup-text">Minted all time:</div>
+        <div class="counter" id="minted-counter">100</div>
+      </div>
+      <div class="timer-container">
+        <div class="popup-text">Next Mint in:</div>
+        <div class="timer" id="timer">2:39:00</div>
+      </div>
+    </div>
+    
   </div>
 </div>
 
 <!-- Поп-ап для выбранных карт -->
 <div id="selected-cards-popup" class="popup">
   <div class="popup-content">
-    <!-- Верхняя серая часть -->
-    <div class="popup-header">Your selected cards</div>
+    <!-- Новая верхняя панель -->
+    <div class="popup-top-panel">
+      <span class="popup-top-panel-text">Your selected cards</span>
+    </div>
     <!-- Галерея выбранных карт -->
     <div id="selected-cards-gallery" class="selected-cards-gallery"></div>
+    <!-- Нижняя панель с кнопками "Craft" и "Withdraw" -->
+    <div class="craft-panel-down">
+      <button id="craft-button">Craft</button>
+      <button id="Withdraw-Deposit-button-in-craft" class="Withdraw-Deposit-button">
+        Withdraw
+      </button>
+    </div>
     <!-- Крестик для закрытия поп-апа -->
+    <span class="close-popup">&times;</span>
+  </div>
+</div>
+
+<!-- Новый поп-ап для "Craft" -->
+<div id="craft-popup" class="popup">
+  <div class="popup-content">
+    <div class="craft-info-container">
+      <button id="burn-button">BURN</button>
+      <div class="craft-title">YOU selected for craft:</div>
+      <div class="card-counter-container">
+        <span id="selected-cards-count">0</span> Lost Cards
+      </div>
+      <div class="craft-text">Are you ready to burn them?</div>
+    </div>
     <span class="close-popup">&times;</span>
   </div>
 </div>
 
 <!-- Левая панель с фильтрами -->
 <div class="filters">
-<!-- Блок для статуса -->
-<div class="status-box">
-<div class="status-label">Your Status</div>
-<div class="status-value">UNGODLY</div>
+  <!-- Блок для статуса -->
+  <div class="status-box">
+    <div class="status-label">Your Status</div>
+    <div class="status-value">UNGODLY</div>
+    <!-- Кнопка Deposit -->
+    <button id="Withdraw-Deposit-button" class="Withdraw-Deposit-button">
+      Deposit
+    </button>
+  </div>
+  
+  <h2>Filter by Rank</h2>
+  <ul id="rank-filters">
+    <li data-rank="2"></li>
+    <li data-rank="3"></li>
+    <li data-rank="4"></li>
+    <li data-rank="5"></li>
+    <li data-rank="6"></li>
+    <li data-rank="7"></li>
+    <li data-rank="8"></li>
+    <li data-rank="9"></li>
+    <li data-rank="10"></li>
+    <li data-rank="jack"></li>
+    <li data-rank="queen"></li>
+    <li data-rank="king"></li>
+    <li data-rank="ace"></li>
+    <li data-rank="jokers"></li>
+    <li data-rank="all">Clear Filter</li>
+  </ul>
 </div>
 
-<h2>Filter by Rank</h2>
-<ul id="rank-filters">
-  <!-- Список рангов -->
-  <li data-rank="2">
-    Two
-  </li>
-  <li data-rank="3">
-    Three
-  </li>
-  <li data-rank="4">
-    Four
-  </li>
-  <li data-rank="5">
-    Five
-  </li>
-  <li data-rank="6">
-    Six
-  </li>
-  <li data-rank="7">
-    Seven
-  </li>
-  <li data-rank="8">
-    Eight
-  </li>
-  <li data-rank="9">
-    Nine
-  </li>
-  <li data-rank="10">
-    Ten
-  </li>
-  <li data-rank="jack">
-    Jack
-  </li>
-  <li data-rank="queen">
-    Queen
-  </li>
-  <li data-rank="king">
-    King
-  </li>
-  <li data-rank="ace">
-    Ace
-  </li>
-  <li data-rank="jokers">
-    Jokers
-  </li>
-  <li data-rank="all">
-    Clear Filter
-  </li>
-</ul>
-
-<!-- Отображение выбранных рангов -->
-<div id="selected-ranks-container">
-<p>No ranks selected</p>
-</div>
+<!-- Поп-ап для Withdraw/Deposit -->
+<div id="Withdraw-Deposit-popup" class="popup">
+  <div class="popup-content">
+    <!-- Убираем заголовок -->
+    <span class="close-popup">&times;</span>
+    <div class="popup-body">
+      <!-- Содержимое поп-апа будет добавлено здесь -->
+    </div>
+  </div>
 </div>
 
 <!-- Центральная панель (галерея) -->
 <div class="gallery">
-<h2>LOST WOLVES</h2>
-<div class="horizontal-line"></div> <!-- Горизонтальная полоса -->
+  <h2 id="header-title">Lost Wolves</h2>
+  <div class="horizontal-line"></div> <!-- Горизонтальная полоса -->
+  
+  <script>
+  // Возврат на главную страницу при клике на заголовок "LOST WOLVES"
+  document.getElementById("header-title").addEventListener("click", () => {
+    window.location.href = "main.html"; // Переход на главную страницу
+  });
+  </script>
+  
 
-<!-- Фильтрация по мастям -->
-<div class="suit-filters-container">
-<div class="suit-filter-column">
-<div data-suit="all">All Suits</div>
-</div>
-<div class="suit-filter-column">
-<div data-suit="hearts">Hearts</div>
-</div>
-<div class="suit-filter-column">
-<div data-suit="spades">Spades</div>
-</div>
-<div class="suit-filter-column">
-<div data-suit="clubs">Clubs</div>
-</div>
-<div class="suit-filter-column">
-<div data-suit="diamonds">Diamonds</div>
-</div>
-</div>
-
-<!-- Галерея карт -->
-<div id="card-gallery">
-<!-- Cards will be added dynamically -->
-</div>
+  <!-- Галерея карт -->
+  <div id="card-gallery">
+    <!-- Cards will be added dynamically -->
+  </div>
 </div>
 
 <!-- Правая панель -->
 <div class="right-panel">
-<div class="right-panel-header">
-LOST TOTEMS
-</div>
-<div class="totem-list">
-<div class="totem-item">
-<span class="totem-counter">x0</span>
-<img src="losttotem.png" alt="Lost Totem" class="totem-image">
-</div>
-<div class="totem-item">
-<span class="totem-counter">x0</span>
-<img src="losttotem.png" alt="Lost Totem" class="totem-image">
-</div>
-<div class="totem-item">
-<span class="totem-counter">x0</span>
-<img src="losttotem.png" alt="Lost Totem" class="totem-image">
-</div>
-<div class="totem-item">
-<span class="totem-counter">x0</span>
-<img src="losttotem.png" alt="Lost Totem" class="totem-image">
-</div>
-<div class="totem-item">
-<span class="totem-counter">x0</span>
-<img src="losttotem.png" alt="Lost Totem" class="totem-image">
-</div>
-<div class="totem-item">
-<span class="totem-counter">x0</span>
-<img src="losttotem.png" alt="Lost Totem" class="totem-image">
-</div>
-<div class="totem-item">
-<span class="totem-counter">x0</span>
-<img src="losttotem.png" alt="Lost Totem" class="totem-image">
-</div>
-</div>
+  <div class="right-panel-header">
+    LOST TOTEMS
+  </div>
+  <div class="totem-list">
+    <div class="totem-item">
+      <span class="totem-counter">x0</span>
+      <img src="losttotem.png" alt="Lost Totem" class="totem-image">
+    </div>
+    <div class="totem-item">
+      <span class="totem-counter">x0</span>
+      <img src="losttotem.png" alt="Lost Totem" class="totem-image">
+    </div>
+    <div class="totem-item">
+      <span class="totem-counter">x0</span>
+      <img src="losttotem.png" alt="Lost Totem" class="totem-image">
+    </div>
+    <div class="totem-item">
+      <span class="totem-counter">x0</span>
+      <img src="losttotem.png" alt="Lost Totem" class="totem-image">
+    </div>
+    <div class="totem-item">
+      <span class="totem-counter">x0</span>
+      <img src="losttotem.png" alt="Lost Totem" class="totem-image">
+    </div>
+    <div class="totem-item">
+      <span class="totem-counter">x0</span>
+      <img src="losttotem.png" alt="Lost Totem" class="totem-image">
+    </div>
+    <div class="totem-item">
+      <span class="totem-counter">x0</span>
+      <img src="losttotem.png" alt="Lost Totem" class="totem-image">
+    </div>
+  </div>
 </div>
 
 <script src="LostCard_test.js"></script> <!-- Подключение JS -->
