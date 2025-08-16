@@ -103,6 +103,17 @@
   border-color: #000000; /* Ободок остаётся черным */
 }
 
+/* Стиль для счётчика количества штук (в попапе и на карте) */
+.card-count-badge {
+  font-size: 14px;
+  color: #a71515; /* Красный цвет, как у "х2" в галерее */
+  font-weight: bold;
+  margin-left: 8px;
+  white-space: nowrap;
+  min-width: 30px; /* Чтобы не сжимался */
+  text-align: center;
+}
+
 /* Счетчик выбранных карт */
 #selected-counter {
   position: absolute; /* Позиционирование относительно кнопки */
@@ -197,17 +208,6 @@
 /* Текст в верхней панели */
 .popup-top-panel-text {
   margin: 0; /* Убираем дефолтные маржины */
-}
-
-/* Крестик закрытия поп-апа */
-.close-popup {
-  position: absolute;
-  top: 10px;
-  right: 15px;
-  font-size: 24px;
-  cursor: pointer;
-  color: #000; /* Черный цвет текста */
-  z-index: 2001; /* Выше содержимого */
 }
 
 .close-popup:hover {
@@ -512,18 +512,23 @@
   color: #a71515; /* Красный цвет */
 }
 
-#mint-popup .close-popup {
+.close-popup {
   position: absolute;
   top: 10px;
   right: 15px;
-  font-size: 24px;
+  font-size: 48px; /* Увеличено в 2 раза */
   cursor: pointer;
   color: #000;
   z-index: 2001;
+  font-weight: normal;
+  line-height: 1;
+  transform: scale(1);
+  transition: transform 0.2s ease;
 }
 
-#mint-popup .close-popup:hover {
-  color: #ff4d4d; /* Красный цвет при наведении */
+.close-popup:hover {
+  color: #ff4d4d;
+  transform: scale(1.1); /* Лёгкое увеличение при наведении */
 }
 
 /* Левая панель с фильтрами */
@@ -631,8 +636,7 @@
   right: 10px; /* Прижато к правому краю */
   top: 50%;
   transform: translateY(-50%);
-  background-color: #a71515;
-  color: #fff;
+  color: #000000;
   font-size: 12px;
   font-weight: bold;
   padding: 2px 8px;
@@ -777,16 +781,6 @@
   border-color: #015301; /* Зелёный ободок при наведении */
 }
 
-/* Крестик закрытия поп-апа */
-#Withdraw-Deposit-popup .close-popup {
-  position: absolute;
-  top: 10px;
-  right: 15px;
-  font-size: 24px;
-  cursor: pointer;
-  color: #000; /* Черный цвет текста */
-  z-index: 2001; /* Выше содержимого */
-}
 
 #Withdraw-Deposit-popup .close-popup:hover {
   color: #ff4d4d; /* Красный цвет при наведении */
@@ -981,6 +975,32 @@
     text-transform: capitalize;
   }
   
+/* Оверлей "Buy" для карт с количеством 0 */
+.card-overlay-buy {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 8px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 2;
+}
+
+.card-overlay-buy.active {
+  opacity: 1;
+}
+
+
 /* Счётчик под карточкой — количество этой конкретной карты */
 .card-count-badge {
   color: #000000;
