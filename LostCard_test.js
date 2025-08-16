@@ -61,21 +61,42 @@ const cards = [
   { rank: "joker-black", suit: "jokers", image: "jokers/joker-black.png", description: "This is a Black Joker" },
 ];
 
-// Сокращения для мастей
+// === ВРЕМЕННАЯ БАЗА ДАННЫХ: количество каждой карты ===
+// Позже заменим на данные с сервера
+const userCardData = {
+  // Hearts
+  "2": { hearts: 3, spades: 0, clubs: 0, diamonds: 1 },
+  "3": { hearts: 1, spades: 2, clubs: 1, diamonds: 2 },
+  "4": { hearts: 2, spades: 1, clubs: 3, diamonds: 1 },
+  "5": { hearts: 1, spades: 1, clubs: 1, diamonds: 1 },
+  "6": { hearts: 2, spades: 2, clubs: 2, diamonds: 2 },
+  "7": { hearts: 1, spades: 3, clubs: 1, diamonds: 1 },
+  "8": { hearts: 1, spades: 1, clubs: 1, diamonds: 3 },
+  "9": { hearts: 2, spades: 2, clubs: 2, diamonds: 2 },
+  "10": { hearts: 1, spades: 1, clubs: 1, diamonds: 1 },
+  jack: { hearts: 3, spades: 1, clubs: 0, diamonds: 2 },
+  queen: { hearts: 1, spades: 2, clubs: 2, diamonds: 1 },
+  king: { hearts: 2, spades: 1, clubs: 1, diamonds: 3 },
+  ace: { hearts: 0, spades: 2, clubs: 1, diamonds: 1 },
+  // Jokers
+  "joker-red": 1,
+  "joker-black": 2
+};
+// === КОНЕЦ БАЗЫ ДАННЫХ ===
+
 const suitShort = {
-  spades: "S",
-  hearts: "H",
-  clubs: "C",
-  diamonds: "D",
+  hearts: "♥",
+  spades: "♠",
+  clubs: "♣",
+  diamonds: "♦",
   jokers: "J"
 };
 
-// Цвета для счётчиков мастей (по умолчанию чёрный, кроме червей)
 const suitColor = {
-  spades: "#000",
-  hearts: "#a71515", // красный
-  clubs: "#000",
-  diamonds: "#a71515", // красный
+  spades: "#000",           // чёрный
+  hearts: "#a71515",        // красный
+  clubs: "#015301",         // зелёный
+  diamonds: "#1550a7",      // синий
   "joker-red": "#a71515",
   "joker-black": "#000"
 };
@@ -121,7 +142,6 @@ function displayCards(filteredCards) {
 
     const cardDiv = document.createElement("div");
     cardDiv.classList.add("card");
-    // Добавляем data-атрибуты для идентификации карты
     cardDiv.dataset.rank = card.rank;
     cardDiv.dataset.suit = card.suit;
 
@@ -130,74 +150,90 @@ function displayCards(filteredCards) {
     img.alt = `Card ${card.rank} of ${card.suit}`;
     cardDiv.appendChild(img);
 
+    // Получаем максимальное количество этой карты
+    const maxAmount = getMaxCardCount(card.rank, card.suit);
+
+    // === Оверлей "BUY", если количество = 0 ===
+    if (maxAmount === 0) {
+      const overlay = document.createElement("div");
+      overlay.classList.add("card-overlay-buy");
+      overlay.textContent = "BUY";
+      cardDiv.appendChild(overlay);
+
+      // Показываем при наведении
+      cardDiv.addEventListener("mouseenter", () => {
+        overlay.classList.add("active");
+      });
+      cardDiv.addEventListener("mouseleave", () => {
+        overlay.classList.remove("active");
+      });
+
+      // Переход по клику (если не по счётчику)
+      cardDiv.addEventListener("click", (e) => {
+        if (!e.target.closest('.counter')) {
+          window.open('https://magiceden.io/', '_blank');
+        }
+      });
+    }
+
     // Проверяем, выбрана ли карта
     const cardKey = `${card.rank} of ${card.suit}`;
     if (selectedCards.includes(cardKey)) {
       cardDiv.classList.add("selected");
-      // Если карта уже выбрана, создаем счетчик
+      // Отложенное создание счётчика
       setTimeout(() => {
         if (!cardDiv.querySelector('.counter')) {
-          createCounter(cardDiv);
+          createCounter(cardDiv, maxAmount);
         }
       }, 0);
     }
 
-    // Добавляем обработчик клика только для создания счетчика
+    // Обработчик клика для выбора и создания счётчика
     cardDiv.addEventListener("click", (event) => {
-      // Проверяем, не кликнули ли по счетчику
-      if (!event.target.closest('.counter')) {
-        // Проверяем, есть ли уже счетчик
-        if (!cardDiv.querySelector('.counter')) {
-          // Добавляем карту в selectedCards если её там нет
-          if (!selectedCards.includes(cardKey)) {
-            selectedCards.push(cardKey);
-            updateSelectedCounter();
-            saveData();
-            updateSelectedCardsPopup(); // Обновляем попап
-          }
-          createCounter(cardDiv);
+      if (event.target.closest('.counter') || maxAmount === 0) return;
+
+      if (!cardDiv.querySelector('.counter')) {
+        if (!selectedCards.includes(cardKey)) {
+          selectedCards.push(cardKey);
+          updateSelectedCounter();
+          saveData();
+          updateSelectedCardsPopup();
         }
+        createCounter(cardDiv, maxAmount);
+        cardDiv.classList.add("selected");
       }
     });
 
-// === КОНТЕЙНЕР ДЛЯ ПОДПИСИ И СЧЁТЧИКА ===
-const labelContainer = document.createElement("div");
-labelContainer.classList.add("card-label-container");
+    // === КОНТЕЙНЕР ДЛЯ ПОДПИСИ И СЧЁТЧИКА ===
+    const labelContainer = document.createElement("div");
+    labelContainer.classList.add("card-label-container");
 
-// Показываем название карты
-const cardLabel = document.createElement("div");
-cardLabel.classList.add("card-label");
-cardLabel.textContent = `${card.rank} of ${card.suit}`;
+    const cardLabel = document.createElement("div");
+    cardLabel.classList.add("card-label");
+    cardLabel.textContent = `${card.rank} of ${card.suit}`;
 
-// Обработчик клика на подпись
-cardLabel.addEventListener("click", (event) => {
-  event.stopPropagation(); // Чтобы не срабатывало на карточку
-  openModal(card.description, event);
-});
+    cardLabel.addEventListener("click", (event) => {
+      event.stopPropagation();
+      openModal(card.description, event);
+    });
 
-// Счётчик количества
-const countBadge = document.createElement("div");
-countBadge.classList.add("card-count-badge");
-countBadge.textContent = "х2"; // ← потом из БД
+    const countBadge = document.createElement("div");
+    countBadge.classList.add("card-count-badge");
+    countBadge.textContent = `х${maxAmount}`; // Правильное количество
 
-// Добавляем в контейнер
-labelContainer.appendChild(cardLabel);
-labelContainer.appendChild(countBadge);
+    labelContainer.appendChild(cardLabel);
+    labelContainer.appendChild(countBadge);
+    // =====================================
 
-// === ФОРМИРУЕМ ПОРЯДОК ДОБАВЛЕНИЯ ===
-cardItem.appendChild(cardDiv);           // Картинка
-cardItem.appendChild(labelContainer);    // Подпись + счётчик
-gallery.appendChild(cardItem);
-// =====================================
+    cardItem.appendChild(cardDiv);
+    cardItem.appendChild(labelContainer);
+    gallery.appendChild(cardItem);
   });
 }
 
-// Функция для создания счетчика
-function createCounter(cardElement) {
-  // Проверяем, есть ли уже счетчик
-  if (cardElement.querySelector('.counter')) {
-    return;
-  }
+function createCounter(cardElement, maxAmount = 1) {
+  if (cardElement.querySelector('.counter')) return;
+
   const counterHtml = `
     <div class="counter">
       <div class="cross-btn minus">
@@ -213,48 +249,70 @@ function createCounter(cardElement) {
   `;
   cardElement.insertAdjacentHTML('beforeend', counterHtml);
   cardElement.classList.add('selected');
+
   const counter = cardElement.querySelector('.counter');
   const valueElement = counter.querySelector('.counter-value');
   const minusBtn = counter.querySelector('.minus');
   const plusBtn = counter.querySelector('.plus');
-  // Обработчики событий для кнопок
+
+  // Блокируем +, если уже максимум
+  function updatePlusButton() {
+    const value = parseInt(valueElement.textContent);
+    plusBtn.style.opacity = value >= maxAmount ? '0.5' : '1';
+    plusBtn.style.cursor = value >= maxAmount ? 'not-allowed' : 'pointer';
+  }
+
+  updatePlusButton();
+
   minusBtn.addEventListener('click', function(e) {
     e.stopPropagation();
     let value = parseInt(valueElement.textContent);
     if (value > 0) {
       value--;
       valueElement.textContent = value;
-      // Обновляем общий счетчик
       updateTotalScore(-1);
-      // Если счетчик стал 0, удаляем его и карту из selected
+      updateSelectedCounter(); // ← ДОБАВИЛ: обновляем общий счётчик
+      updatePlusButton();
+  
       if (value === 0) {
         setTimeout(() => {
           counter.remove();
-          cardElement.classList.remove('selected'); // Возвращаем карту в состояние не выбранности
-          // Удаляем карту из selectedCards
+          cardElement.classList.remove('selected');
           const cardKey = getCardKeyFromElement(cardElement);
-          if (cardKey) {
-            const index = selectedCards.indexOf(cardKey);
-            if (index !== -1) {
-              selectedCards.splice(index, 1);
-              updateSelectedCounter();
-              saveData();
-              updateSelectedCardsPopup(); // Обновляем попап
-            }
+          const index = selectedCards.indexOf(cardKey);
+          if (index !== -1) {
+            selectedCards.splice(index, 1);
+            saveData();
+            updateSelectedCardsPopup();
           }
+          updateSelectedCounter(); // ← всё равно нужно (на случай, если удалили последнюю)
         }, 100);
       }
     }
   });
+
   plusBtn.addEventListener('click', function(e) {
     e.stopPropagation();
     let value = parseInt(valueElement.textContent);
-    value++;
-    valueElement.textContent = value;
-    // Обновляем общий счетчик
-    updateTotalScore(1);
+    if (value < maxAmount) {
+      value++;
+      valueElement.textContent = value;
+      updateTotalScore(1);
+      updateSelectedCounter(); // ← ДОБАВИЛ: обновляем общий счётчик
+      updatePlusButton();
+    }
   });
 }
+
+// Получаем максимальное количество карты (из userCardData)
+function getMaxCardCount(rank, suit) {
+  if (rank === "joker-red" || rank === "joker-black") {
+    return userCardData[rank] || 0;
+  }
+  return userCardData[rank]?.[suit] || 0;
+}
+
+
 
 // Вспомогательная функция для получения ключа карты из элемента
 function getCardKeyFromElement(cardElement) {
@@ -272,69 +330,77 @@ function updateTotalScore(change) {
   // Пока оставляем пустой, но можно реализовать при необходимости
 }
 
-// Функция для обновления попапа с выбранными картами
 function updateSelectedCardsPopup() {
   const gallery = document.getElementById("selected-cards-gallery");
   if (!gallery) return;
 
-  // Очищаем галерею
   gallery.innerHTML = "";
 
-  // Отображаем выбранные карты
   selectedCards.forEach((cardKey) => {
     const cardData = cards.find((card) => `${card.rank} of ${card.suit}` === cardKey);
-    if (cardData) {
-      const cardItem = document.createElement("div");
-      cardItem.classList.add("selected-card-item");
+    if (!cardData) return;
 
-      // Изображение карточки
-      const img = document.createElement("img");
-      img.src = cardData.image;
-      img.alt = `Card ${cardData.rank} of ${cardData.suit}`;
+    const cardItem = document.createElement("div");
+    cardItem.classList.add("selected-card-item");
 
-      // Название карточки
-      const cardName = document.createElement("div");
-      cardName.classList.add("selected-card-name");
-      cardName.textContent = `${cardData.rank} of ${cardData.suit}`;
+    // Изображение
+    const img = document.createElement("img");
+    img.src = cardData.image;
+    img.alt = cardKey;
 
-      // Крестик для удаления
-      const removeButton = document.createElement("span");
-      removeButton.classList.add("selected-card-remove");
-      removeButton.textContent = "×";
-      removeButton.addEventListener("click", () => {
-        const index = selectedCards.indexOf(cardKey);
-        if (index !== -1) {
-          // Удаляем карточку из массива
-          selectedCards.splice(index, 1);
+    // Контейнер для имени и счётчика
+    const nameContainer = document.createElement("div");
+    nameContainer.style.display = "flex";
+    nameContainer.style.alignItems = "center";
+    nameContainer.style.gap = "8px";
+    nameContainer.style.flexGrow = "1";
 
-          // Находим соответствующую карточку в галерее и удаляем счетчик
-          const cardInGallery = document.querySelector(
-            `.card[data-rank="${cardData.rank}"][data-suit="${cardData.suit}"]`
-          );
-          if (cardInGallery) {
-            const counter = cardInGallery.querySelector('.counter');
-            if (counter) {
-              counter.remove();
-            }
-            cardInGallery.classList.remove("selected");
-          }
+    // Название
+    const cardName = document.createElement("div");
+    cardName.classList.add("selected-card-name");
+    cardName.textContent = `${cardData.rank} of ${cardData.suit}`;
 
-          // Удаляем карточку из DOM поп-апа
-          cardItem.remove();
+    // Счётчик количества штук — как в главной галерее
+    const countBadge = document.createElement("div");
+    countBadge.classList.add("card-count-badge"); // ← используем тот же класс
+    countBadge.style.margin = "0"; // убираем лишние отступы, если нужно
 
-          // Обновляем счетчик выбранных карт
-          updateSelectedCounter();
+    // Получаем реальное количество из счётчика на карте
+    const cardElement = document.querySelector(`.card[data-rank="${cardData.rank}"][data-suit="${cardData.suit}"]`);
+    const valueEl = cardElement?.querySelector('.counter-value');
+    const count = valueEl ? parseInt(valueEl.textContent) : 1;
+    countBadge.textContent = `x${count}`;
 
-          // Сохраняем данные
-          saveData();
-        }
-      });
+    nameContainer.appendChild(cardName);
+    nameContainer.appendChild(countBadge);
 
-      cardItem.appendChild(img);
-      cardItem.appendChild(cardName);
-      cardItem.appendChild(removeButton);
-      gallery.appendChild(cardItem);
-    }
+    // Крестик удаления
+    const removeButton = document.createElement("span");
+    removeButton.classList.add("selected-card-remove");
+    removeButton.textContent = "×";
+    removeButton.addEventListener("click", () => {
+      const index = selectedCards.indexOf(cardKey);
+      if (index !== -1) {
+        selectedCards.splice(index, 1);
+      }
+
+      const cardInGallery = document.querySelector(`.card[data-rank="${cardData.rank}"][data-suit="${cardData.suit}"]`);
+      if (cardInGallery) {
+        const counter = cardInGallery.querySelector('.counter');
+        if (counter) counter.remove();
+        cardInGallery.classList.remove("selected");
+      }
+
+      updateSelectedCounter();
+      updateSelectedCardsPopup();
+      saveData();
+    });
+
+    // Собираем карточку
+    cardItem.appendChild(img);
+    cardItem.appendChild(nameContainer);   // ← счётчик внутри, рядом с названием
+    cardItem.appendChild(removeButton);
+    gallery.appendChild(cardItem);
   });
 }
 
@@ -358,13 +424,29 @@ function applyFilters() {
 
     const isActive = selectedRanks.has(rank);
 
-    // Пример данных (позже — из userCardData)
-    const counts = { spades: 1, hearts: 1, clubs: 1, diamonds: 1, "joker-red": 1, "joker-black": 1 };
-    if (rank === "2") Object.assign(counts, { spades: 0, hearts: 3, clubs: 0, diamonds: 1 });
-    if (rank === "ace") Object.assign(counts, { spades: 2, hearts: 0, clubs: 1, diamonds: 0 });
-    if (rank === "jokers") Object.assign(counts, { "joker-red": 1, "joker-black": 1 });
+// Получаем количество карт по масти для текущего ранга
+function getRankCounts(rank) {
+  const counts = { spades: 0, hearts: 0, clubs: 0, diamonds: 0, "joker-red": 0, "joker-black": 0 };
 
-    const total = Object.values(counts).reduce((a, b) => a + b, 0);
+  if (rank === "jokers") {
+    counts["joker-red"] = userCardData["joker-red"] || 0;
+    counts["joker-black"] = userCardData["joker-black"] || 0;
+  } else {
+    const data = userCardData[rank];
+    if (data) {
+      counts.spades = data.spades || 0;
+      counts.hearts = data.hearts || 0;
+      counts.clubs = data.clubs || 0;
+      counts.diamonds = data.diamonds || 0;
+    }
+  }
+
+  return counts;
+}
+
+// Внутри applyFilters(), замени блок с counts на:
+const counts = getRankCounts(rank);
+const total = Object.values(counts).reduce((a, b) => a + b, 0);
 
 // Формируем строку с мастями
 let suitText = "";
@@ -375,18 +457,18 @@ if (rank === "jokers") {
   `.trim();
 } else {
   suitText = [
-    `<span style="color:${suitColor.spades}">${counts.spades}${suitShort.spades}</span>`,
-    `<span style="color:${suitColor.hearts}">${counts.hearts}${suitShort.hearts}</span>`,
-    `<span style="color:${suitColor.clubs}">${counts.clubs}${suitShort.clubs}</span>`,
-    `<span style="color:${suitColor.diamonds}">${counts.diamonds}${suitShort.diamonds}</span>`
+    `<span style="color:${suitColor.hearts}">${counts.hearts}♥</span>`,
+    `<span style="color:${suitColor.spades}">${counts.spades}♠</span>`,
+    `<span style="color:${suitColor.clubs}">${counts.clubs}♣</span>`,
+    `<span style="color:${suitColor.diamonds}">${counts.diamonds}♦</span>`
   ].join(" ");
 }
 
     // Словарь названий
     const rankNames = {
-      "2": "Two", "3": "Three", "4": "Four", "5": "Five", "6": "Six",
-      "7": "Seven", "8": "Eight", "9": "Nine", "10": "Ten",
-      jack: "Jack", queen: "Queen", king: "King", ace: "Ace", jokers: "Jokers"
+      "2": "TWOs", "3": "THREEs", "4": "FOURs", "5": "FIVEs", "6": "SIXs",
+      "7": "SEVENs", "8": "EIGHTs", "9": "NINEs", "10": "TENs",
+      jack: "JACKs", queen: "QUEENs", king: "KINGs", ace: "ACEs", jokers: "JOKERs"
     };
     const rankName = rankNames[rank];
 
@@ -406,7 +488,7 @@ if (rank === "jokers") {
     const rankCountEl = li.querySelector(".rank-count");
 
     if (suitsCountEl) suitsCountEl.innerHTML = suitText;
-    if (rankCountEl) rankCountEl.textContent = total;
+    if (rankCountEl) rankCountEl.innerHTML = `Total ${total}`;
 
     // Переключаем класс
     if (isActive) {
@@ -501,14 +583,20 @@ function updateSelectedRanksDisplay() {
   });
 }
 
-// Кнопка "Deselect All Cards" в нижней панели
 document.getElementById("deselect-all-cards").addEventListener("click", () => {
-  selectedCards = []; // Очищаем массив выбранных карт
+  selectedCards = []; // Очищаем выбранные
+
   document.querySelectorAll(".card.selected").forEach(card => {
-    card.classList.remove("selected"); // Убираем класс "selected" со всех карточек
+    card.classList.remove("selected"); // Убираем стиль
+    const counter = card.querySelector('.counter');
+    if (counter) {
+      counter.remove(); // Удаляем счётчик
+    }
   });
-  saveData(); // Сохраняем изменения в localStorage
-  updateSelectedCounter(); // Обновляем счетчик (он станет равен 0)
+
+  saveData();
+  updateSelectedCounter();
+  updateSelectedCardsPopup(); // Обновляем поп-ап
 });
 
 // Кнопка "Selected" в нижней панели
@@ -641,11 +729,24 @@ document.querySelector("#selected-cards-popup .close-popup").addEventListener("c
 // Функция для обновления счетчика выбранных карт
 function updateSelectedCounter() {
   const counter = document.getElementById("selected-counter");
-  if (selectedCards.length > 0) {
-    counter.textContent = selectedCards.length; // Обновляем значение счетчика
-    counter.style.display = "block"; // Показываем счетчик
+
+  // Считаем общее количество выбранных штук
+  let total = 0;
+  selectedCards.forEach((cardKey) => {
+    const cardData = cards.find((card) => `${card.rank} of ${card.suit}` === cardKey);
+    if (cardData) {
+      const cardElement = document.querySelector(`.card[data-rank="${cardData.rank}"][data-suit="${cardData.suit}"]`);
+      const counterValueEl = cardElement?.querySelector('.counter-value');
+      const count = counterValueEl ? parseInt(counterValueEl.textContent) : 1;
+      total += count;
+    }
+  });
+
+  if (total > 0) {
+    counter.textContent = total;
+    counter.style.display = "block";
   } else {
-    counter.style.display = "none"; // Скрываем счетчик, если нет выбранных карт
+    counter.style.display = "none";
   }
 }
 
@@ -722,29 +823,46 @@ document.addEventListener('DOMContentLoaded', () => {
 // Функция для открытия поп-апа Withdraw/Deposit
 function openWithdrawDepositPopup(buttonType) {
   const popup = document.getElementById("Withdraw-Deposit-popup");
-  popup.style.display = "flex"; // Показываем поп-ап
+  popup.style.display = "flex";
   const popupBody = popup.querySelector(".popup-body");
-  // Создаем содержимое поп-апа
-  const popupContent = `
+
+  // Формируем содержимое
+  let popupContent = `
     <div class="popup-title">${buttonType === 'deposit' ? 'Deposit' : 'Withdraw'}</div>
     <div class="form-container">
+  `;
+
+  if (buttonType === 'deposit') {
+    popupContent += `
+      <!-- Заглушка QR-кода -->
+      <img src="MyQRCodeForDeposit.jpeg" alt="QR Code for Deposit" class="qr-code-image" style="width: 200px; height: 200px; margin: 20px auto; display: block;">
+      <!-- TODO: Добавить динамическую генерацию QR-кода по адресу кошелька -->
+      <!-- Можно использовать библиотеку, например, qrcode.js -->
+    `;
+  } else {
+    popupContent += `
       <input type="number" class="input-field" placeholder="Enter amount" id="amount-input">
       <div class="action-buttons">
-        <button id="${buttonType}-button">${buttonType === 'deposit' ? 'Deposit' : 'Withdraw'}</button>
+        <button id="withdraw-button">Withdraw</button>
       </div>
-    </div>
-  `;
+    `;
+  }
+
+  popupContent += `</div>`;
   popupBody.innerHTML = popupContent;
 
-  // Обработчик события для кнопки Deposit или Withdraw
-  document.getElementById(`${buttonType}-button`).addEventListener("click", () => {
-    const amountInput = document.getElementById("amount-input");
-    const amount = parseFloat(amountInput.value);
-    if (amount > 0) {
-      alert(`${buttonType.charAt(0).toUpperCase() + buttonType.slice(1)}: ${amount}`);
-      // Здесь можно добавить логику для депозита или вывода средств
-    }
-  });
+  // Только для Withdraw — добавляем обработчик
+  if (buttonType === 'withdraw') {
+    document.getElementById("withdraw-button").addEventListener("click", () => {
+      const amountInput = document.getElementById("amount-input");
+      const amount = parseFloat(amountInput.value);
+      if (amount > 0) {
+        alert(`Withdraw: ${amount}`);
+        // TODO: Реализовать логику вывода средств
+        closeWithdrawDepositPopup();
+      }
+    });
+  }
 }
 
 // Функция для закрытия поп-апа Withdraw/Deposit
