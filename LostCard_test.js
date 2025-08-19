@@ -604,73 +604,6 @@ document.getElementById("selected-cards-button").addEventListener("click", () =>
   openSelectedCardsPopup();
 });
 
-// Функция для открытия поп-апа с выбранными картами
-function openSelectedCardsPopup() {
-  const popup = document.getElementById("selected-cards-popup");
-  const gallery = document.getElementById("selected-cards-gallery");
-
-  // Очищаем галерею
-  gallery.innerHTML = "";
-
-  // Отображаем выбранные карты
-  selectedCards.forEach((cardKey) => {
-    const cardData = cards.find((card) => `${card.rank} of ${card.suit}` === cardKey);
-    if (cardData) {
-      const cardItem = document.createElement("div");
-      cardItem.classList.add("selected-card-item");
-
-      // Изображение карточки
-      const img = document.createElement("img");
-      img.src = cardData.image;
-      img.alt = `Card ${cardData.rank} of ${cardData.suit}`;
-
-      // Название карточки
-      const cardName = document.createElement("div");
-      cardName.classList.add("selected-card-name");
-      cardName.textContent = `${cardData.rank} of ${cardData.suit}`;
-
-      
-
-      // Крестик для удаления
-      const removeButton = document.createElement("span");
-      removeButton.classList.add("selected-card-remove");
-      removeButton.textContent = "×";
-      removeButton.addEventListener("click", () => {
-        const index = selectedCards.indexOf(cardKey);
-        if (index !== -1) {
-          // Удаляем карточку из массива
-          selectedCards.splice(index, 1);
-
-          // Находим соответствующую карточку в галерее и удаляем класс "selected"
-          const cardInGallery = document.querySelector(
-            `.card img[alt="Card ${cardData.rank} of ${cardData.suit}"]`
-          );
-          if (cardInGallery) {
-            const cardDiv = cardInGallery.parentElement;
-            cardDiv.classList.remove("selected"); // Убираем эффект огонька
-          }
-
-          // Удаляем карточку из DOM поп-апа
-          cardItem.remove();
-
-          // Обновляем счетчик выбранных карт
-          updateSelectedCounter();
-
-          // Сохраняем данные
-          saveData();
-        }
-      });
-
-      cardItem.appendChild(img);
-      cardItem.appendChild(cardName);
-      cardItem.appendChild(removeButton);
-      gallery.appendChild(cardItem);
-    }
-  });
-
-  // Показываем поп-ап
-  popup.style.display = "flex";
-}
 
 /// Функция для анимации счетчика выбранных карт для крафта
 function animateCounter(element, targetValue, duration = 1000) {
@@ -809,58 +742,78 @@ function startTimer(duration, display) {
 }
 
 // Запуск анимации при открытии поп-апа минта
-document.addEventListener('DOMContentLoaded', () => {
-  const popup = document.getElementById('mint-popup');
-  popup.style.display = 'flex'; // Показываем поп-ап
-  startCountdown(); // Запускаем анимацию счетчика
+document.getElementById("mint-button").addEventListener("click", () => {
+  const mintPopup = document.getElementById("mint-popup");
+  mintPopup.style.display = "flex";
 
-  // Устанавливаем начальное значение таймера (2 часа 39 минут)
-  const duration = 2 * 3600 + 39 * 60; // 2 часа и 39 минут в секундах
-  const display = document.getElementById('timer');
-  startTimer(duration, display); // Запускаем таймер
+  // Сброс и запуск счётчика
+  startCountdown(); // Анимация от 52 до 2
+
+  // Сброс и запуск таймера
+  const duration = 2 * 3600 + 39 * 60; // 2:39:00
+  const timerElement = document.getElementById('timer');
+  startTimer(duration, timerElement);
 });
 
-// Функция для открытия поп-апа Withdraw/Deposit
-function openWithdrawDepositPopup(buttonType) {
+// === Функция открытия поп-апа: Deposit или Withdraw ===
+function openWithdrawDepositPopup(action) {
   const popup = document.getElementById("Withdraw-Deposit-popup");
-  popup.style.display = "flex";
   const popupBody = popup.querySelector(".popup-body");
+  popupBody.innerHTML = ""; // Очищаем
 
-  // Формируем содержимое
-  let popupContent = `
-    <div class="popup-title">${buttonType === 'deposit' ? 'Deposit' : 'Withdraw'}</div>
-    <div class="form-container">
-  `;
+  const content = document.createElement("div");
 
-  if (buttonType === 'deposit') {
-    popupContent += `
-      <!-- Заглушка QR-кода -->
-      <img src="MyQRCodeForDeposit.jpeg" alt="QR Code for Deposit" class="qr-code-image" style="width: 200px; height: 200px; margin: 20px auto; display: block;">
-      <!-- TODO: Добавить динамическую генерацию QR-кода по адресу кошелька -->
-      <!-- Можно использовать библиотеку, например, qrcode.js -->
+  if (action === 'deposit') {
+    // === Deposit: показываем QR-код ===
+    content.innerHTML = `
+      <div class="popup-title">Deposit</div>
+      <img src="MyQRCodeForDeposit.jpeg" alt="QR Code for Deposit" class="qr-code-image">
     `;
-  } else {
-    popupContent += `
-      <input type="number" class="input-field" placeholder="Enter amount" id="amount-input">
-      <div class="action-buttons">
-        <button id="withdraw-button">Withdraw</button>
+  } else if (action === 'withdraw') {
+    // === Withdraw: форма для ввода кошелька с иконкой вставки ===
+    content.innerHTML = `
+      <div class="popup-title">Withdraw</div>
+      <div class="wallet-input-container">
+        <label for="wallet-address">Your wallet</label>
+        <div class="input-with-icon">
+          <input type="text" id="wallet-address" placeholder="Enter wallet address">
+          <button type="button" id="paste-wallet-btn" class="paste-btn">
+            <svg class="clipboard-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <rect x="9" y="9" width="13" height="13" stroke="currentColor" stroke-width="2" 
+                    stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+              <path d="M5 16H4C2.89543 16 2 15.1046 2 14V4C2 2.89543 2.89543 2 4 2H14C15.1046 2 16 2.89543 16 4V5" 
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
       </div>
+      <button id="confirm-withdraw-btn" class="action-button withdraw">Confirm Withdraw</button>
     `;
   }
 
-  popupContent += `</div>`;
-  popupBody.innerHTML = popupContent;
+  popupBody.appendChild(content);
+  popup.style.display = "flex";
 
-  // Только для Withdraw — добавляем обработчик
-  if (buttonType === 'withdraw') {
-    document.getElementById("withdraw-button").addEventListener("click", () => {
-      const amountInput = document.getElementById("amount-input");
-      const amount = parseFloat(amountInput.value);
-      if (amount > 0) {
-        alert(`Withdraw: ${amount}`);
-        // TODO: Реализовать логику вывода средств
-        closeWithdrawDepositPopup();
+  // === Обработчик для кнопки вставки из буфера (только для Withdraw) ===
+  if (action === 'withdraw') {
+    document.getElementById('paste-wallet-btn').addEventListener('click', async () => {
+      try {
+        const text = await navigator.clipboard.readText();
+        document.getElementById('wallet-address').value = text;
+      } catch (err) {
+        alert('Failed to read clipboard. Please paste manually.');
       }
+    });
+
+    // === Обработчик подтверждения вывода ===
+    document.getElementById('confirm-withdraw-btn').addEventListener('click', () => {
+      const address = document.getElementById('wallet-address').value.trim();
+      if (!address) {
+        alert('Please enter a wallet address');
+        return;
+      }
+      alert(`Withdraw to: ${address}`);
+      closeWithdrawDepositPopup();
     });
   }
 }
@@ -892,6 +845,57 @@ document.getElementById("Withdraw-Deposit-popup").addEventListener("click", (eve
     closeWithdrawDepositPopup();
   }
 });
+
+
+// Только на мобильных
+if (window.innerWidth <= 768) {
+  setupSwipePanels();
+}
+
+function setupSwipePanels() {
+  const leftPanel = document.querySelector('.panel-swipe-container.left');
+  const rightPanel = document.querySelector('.panel-swipe-container.right');
+
+  // Обработчики свайпов
+  let startX = 0;
+
+  // Для левой панели
+  document.addEventListener('touchstart', (e) => {
+    startX = e.touches[0].clientX;
+  }, { passive: true });
+
+  document.addEventListener('touchend', (e) => {
+    const endX = e.changedTouches[0].clientX;
+    const diff = startX - endX;
+
+    // Свайп влево → открываем правую панель
+    if (startX > 100 && diff > 50) {
+      rightPanel.classList.add('active');
+      leftPanel.classList.remove('active');
+    }
+
+    // Свайп вправо → открываем левую панель
+    if (diff < -50) {
+      leftPanel.classList.add('active');
+      rightPanel.classList.remove('active');
+    }
+  });
+
+  // Закрытие по клику на оверлей
+  [leftPanel, rightPanel].forEach(panel => {
+    const overlay = panel.querySelector('.overlay') || createOverlay(panel);
+    overlay.addEventListener('click', () => {
+      panel.classList.remove('active');
+    });
+  });
+
+  function createOverlay(parent) {
+    const overlay = document.createElement('div');
+    overlay.classList.add('overlay');
+    parent.appendChild(overlay);
+    return overlay;
+  }
+}
 
 // Инициализация страницы
 loadSavedData();
