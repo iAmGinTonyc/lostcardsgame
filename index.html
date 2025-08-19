@@ -56,7 +56,7 @@
     <!-- Нижняя панель с кнопками "Craft" и "Withdraw" -->
     <div class="craft-panel-down">
       <button id="craft-button">Craft</button>
-      <button id="Withdraw-Deposit-button-in-craft" class="Withdraw-Deposit-button">
+      <button id="withdraw-button" class="Withdraw-Deposit-button">
         Withdraw
       </button>
     </div>
@@ -81,36 +81,37 @@
 </div>
 
 <!-- Левая панель с фильтрами -->
-<div class="filters">
-  <!-- Блок для статуса -->
-  <div class="status-box">
-    <div class="status-label">Your Status</div>
-    <div class="status-value">UNGODLY</div>
-    <!-- Кнопка Deposit -->
-    <button id="Withdraw-Deposit-button" class="Withdraw-Deposit-button">
-      Deposit
-    </button>
+<div class="panel-swipe-container left">
+  <div class="filters">
+    <!-- Блок для статуса -->
+    <div class="status-box">
+      <div class="status-label">Your Status</div>
+      <div class="status-value">UNGODLY</div>
+      <!-- Кнопка Deposit -->
+      <button id="deposit-button" class="Withdraw-Deposit-button">
+        Deposit
+      </button>
+    </div>
+    
+    <h2>Filter by Rank</h2>
+    <ul id="rank-filters">
+      <li data-rank="2">Two</li>
+      <li data-rank="3">Three</li>
+      <li data-rank="4">Four</li>
+      <li data-rank="5">Five</li>
+      <li data-rank="6">Six</li>
+      <li data-rank="7">Seven</li>
+      <li data-rank="8">Eight</li>
+      <li data-rank="9">Nine</li>
+      <li data-rank="10">Ten</li>
+      <li data-rank="jack">Jack</li>
+      <li data-rank="queen">Queen</li>
+      <li data-rank="king">King</li>
+      <li data-rank="ace">Ace</li>
+      <li data-rank="jokers">Jokers</li>
+      <li data-rank="all">Clear Filter</li>
+    </ul>
   </div>
-  
-  <h2>Filter by Rank</h2>
-  <ul id="rank-filters">
-    <!-- Список рангов -->
-    <li data-rank="2">Two</li>
-    <li data-rank="3">Three</li>
-    <li data-rank="4">Four</li>
-    <li data-rank="5">Five</li>
-    <li data-rank="6">Six</li>
-    <li data-rank="7">Seven</li>
-    <li data-rank="8">Eight</li>
-    <li data-rank="9">Nine</li>
-    <li data-rank="10">Ten</li>
-    <li data-rank="jack">Jack</li>
-    <li data-rank="queen">Queen</li>
-    <li data-rank="king">King</li>
-    <li data-rank="ace">Ace</li>
-    <li data-rank="jokers">Jokers</li>
-    <li data-rank="all">Clear Filter</li>
-  </ul>
 </div>
 
 <!-- Поп-ап для Withdraw/Deposit -->
@@ -143,38 +144,38 @@
 </div>
 
 <!-- Правая панель -->
-<div class="right-panel">
-  <div class="right-panel-header">
-    LOST TOTEMS
-  </div>
-  <div class="totem-list">
-    <div class="totem-item">
-      <span class="totem-counter">x0</span>
-      <img src="losttotem.png" alt="Lost Totem" class="totem-image">
-    </div>
-    <div class="totem-item">
-      <span class="totem-counter">x0</span>
-      <img src="losttotem.png" alt="Lost Totem" class="totem-image">
-    </div>
-    <div class="totem-item">
-      <span class="totem-counter">x0</span>
-      <img src="losttotem.png" alt="Lost Totem" class="totem-image">
-    </div>
-    <div class="totem-item">
-      <span class="totem-counter">x0</span>
-      <img src="losttotem.png" alt="Lost Totem" class="totem-image">
-    </div>
-    <div class="totem-item">
-      <span class="totem-counter">x0</span>
-      <img src="losttotem.png" alt="Lost Totem" class="totem-image">
-    </div>
-    <div class="totem-item">
-      <span class="totem-counter">x0</span>
-      <img src="losttotem.png" alt="Lost Totem" class="totem-image">
-    </div>
-    <div class="totem-item">
-      <span class="totem-counter">x0</span>
-      <img src="losttotem.png" alt="Lost Totem" class="totem-image">
+<div class="panel-swipe-container right">
+  <div class="right-panel">
+    <div class="right-panel-header">LOST TOTEMS</div>
+    <div class="totem-list">
+      <div class="totem-item">
+        <span class="totem-counter">x0</span>
+        <img src="losttotem.png" alt="Lost Totem" class="totem-image">
+      </div>
+      <div class="totem-item">
+        <span class="totem-counter">x0</span>
+        <img src="losttotem.png" alt="Lost Totem" class="totem-image">
+      </div>
+      <div class="totem-item">
+        <span class="totem-counter">x0</span>
+        <img src="losttotem.png" alt="Lost Totem" class="totem-image">
+      </div>
+      <div class="totem-item">
+        <span class="totem-counter">x0</span>
+        <img src="losttotem.png" alt="Lost Totem" class="totem-image">
+      </div>
+      <div class="totem-item">
+        <span class="totem-counter">x0</span>
+        <img src="losttotem.png" alt="Lost Totem" class="totem-image">
+      </div>
+      <div class="totem-item">
+        <span class="totem-counter">x0</span>
+        <img src="losttotem.png" alt="Lost Totem" class="totem-image">
+      </div>
+      <div class="totem-item">
+        <span class="totem-counter">x0</span>
+        <img src="losttotem.png" alt="Lost Totem" class="totem-image">
+      </div>
     </div>
   </div>
 </div>
