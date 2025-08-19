@@ -585,16 +585,15 @@
   padding: 8px 12px;
   display: flex;
   align-items: center;
-  cursor: pointer;
   color: #666;
   font-size: 16.1px;
   white-space: nowrap;
   transition: color 0.3s ease;
-  overflow: hidden; /* Чтобы не было переполнения */
+  overflow: hidden;
 }
 
-.filters li:hover {
-  color: #a71515; /* Цвет текста при наведении */
+.filters li:hover .rank-name {
+  color: #a71515;
 }
 
 
@@ -622,12 +621,13 @@
   font-weight: bold;
   color: inherit;
   z-index: 2;
-  transition: left 0.4s ease;
+  transition: left 0.4s ease, color 0.3s ease;
   pointer-events: auto;
   max-width: 120px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  cursor: pointer; /* Курсор только на тексте */
 }
 
 /* Общий счётчик — справа, поверх */
@@ -1096,34 +1096,191 @@
   object-fit: contain; /* Сохраняем пропорции картинки */
   }
 
+  /* === СТИЛИ ДЛЯ ПОП-АПА WITHDRAW === */
 
-  @media (max-width: 768px) {
-    .filters, .right-panel {
-      width: 60px; /* Скрываем текст */
-      padding: 20px 10px;
-    }
-  
-    .rank-name, .Withdraw-Deposit-button, .status-value {
-      display: none; /* Скрываем текст */
-    }
-  
-    .gallery h2 {
-      font-size: 2.5rem;
-    }
-  
-    .card-item {
-      width: calc(50% - 8px); /* 2 карты в строке */
-    }
-  
-    .bottom-panel {
-      padding-left: 10px;
-      gap: 10px;
-    }
-  
-    #deselect-all-cards,
-    #selected-cards-button,
-    #mint-button {
-      padding: 8px 20px;
-      font-size: 12px;
-    }
+/* QR-код при депозите */
+.qr-code-image {
+  width: 200px;
+  height: 200px;
+  margin: 20px auto;
+  display: block;
+  border-radius: 8px;
+}
+
+/* Контейнер для ввода кошелька */
+.wallet-input-container {
+  width: 100%;
+  max-width: 300px;
+  margin: 10px auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.wallet-input-container label {
+  font-size: 14px;
+  color: #555;
+}
+
+/* Поле ввода с иконкой */
+.input-with-icon {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.input-with-icon input {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  outline: none;
+  font-size: 14px;
+}
+
+/* Кнопка вставки */
+.paste-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  transition: color 0.2s;
+}
+
+.paste-btn:hover {
+  color: #000;
+}
+
+/* Иконка буфера */
+.clipboard-icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* Кнопка подтверждения вывода */
+.action-button.withdraw {
+  width: 100%;
+  max-width: 300px;
+  margin: 15px auto 0;
+  padding: 12px;
+  background-color: #a71515;
+  color: #fff;
+  border: none;
+  border-radius: 30px;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: 'FjallaOne', sans-serif;
+  transition: background-color 0.3s;
+}
+
+.action-button.withdraw:hover {
+  background-color: #c22113;
+}
+
+@media (max-width: 768px) {
+  /* Панели: скрываем текст, оставляем только иконки */
+  .filters, .right-panel {
+    width: 60px;
+    padding: 20px 10px;
   }
+
+  .rank-name, .Withdraw-Deposit-button, .status-value {
+    display: none;
+  }
+
+  /* Заголовок галереи */
+  .gallery h2 {
+    font-size: 2.5rem;
+  }
+
+  /* Карты: 2 в строке */
+  .card-item {
+    width: calc(50% - 8px);
+  }
+
+  /* Нижняя панель: компактные отступы */
+  .bottom-panel {
+    padding-left: 10px;
+    gap: 10px;
+  }
+
+  /* Кнопки в нижней панели — меньше */
+  #deselect-all-cards,
+  #selected-cards-button,
+  #mint-button {
+    padding: 8px 20px;
+    font-size: 12px;
+  }
+
+  /* Счётчик выбранных карт — компактный */
+  #selected-counter {
+    right: -5px;
+    top: -8px;
+    padding: 4px 8px;
+    font-size: 10px;
+  }
+
+  /* Фильтры: уменьшаем шрифт счётчиков */
+  .rank-count {
+    font-size: 11px;
+    padding: 2px 6px;
+  }
+
+  /* Поп-ап выбранных карт: одна карта в строке */
+  .selected-card-item {
+    width: 100%;
+    min-width: auto;
+  }
+
+  /* Свайп-контейнеры */
+.panel-swipe-container {
+  position: fixed;
+  top: 0;
+  height: 100vh;
+  width: 220px; /* Ширина панели */
+  z-index: 1100;
+  overflow: hidden;
+}
+
+.panel-swipe-container.left {
+  left: -200px; /* Скрыта слева */
+  transition: left 0.3s ease;
+}
+
+.panel-swipe-container.right {
+  right: -200px; /* Скрыта справа */
+  transition: right 0.3s ease;
+}
+
+/* Показываем панель при активации */
+.panel-swipe-container.left.active {
+  left: 0;
+}
+
+.panel-swipe-container.right.active {
+  right: 0;
+}
+
+/* Фон-оверлей при открытии панели */
+.panel-swipe-container .overlay {
+  display: none;
+}
+
+.panel-swipe-container.active .overlay {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  z-index: 1099;
+  cursor: pointer;
+}
+}
