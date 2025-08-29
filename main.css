@@ -121,27 +121,95 @@ body {
     0 2px 4px rgba(0, 0, 0, 0.6); /* Верхняя тень для имитации inset */
 }
 
-/* Стиль для кнопки "Collect" */
-#collect-button {
-  padding: 10px 40px; /* Отступы внутри кнопки */
-  background-color: #000; /* Черный фон */
-  color: #fff; /* Белый текст */
-  border: none; /* Убираем границу */
-  border-radius: 32px; /* Закругленные углы */
+/* Стиль для кнопки "Login/Register" */
+#login-register-button {
+  padding: 10px 40px;
+  background-color: #000;
+  color: #fff;
+  border: none;
+  border-radius: 32px;
   font-size: 16px;
   font-weight: bold;
   cursor: pointer;
-  transition: all 0.3s ease; /* Плавные переходы */
-  box-shadow: 0 4px 8px rgba(255, 255, 255, 0.3); /* Белая тень */
-  font-family: 'FjallaOne', Arial, sans-serif; /* Новый шрифт */
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(255, 255, 255, 0.3);
+  font-family: 'FjallaOne', Arial, sans-serif;
 }
 
 /* Эффект при наведении на кнопку */
-#collect-button:hover {
-  background-color: #ffffff; /* Темно-серый фон */
-  box-shadow: 0 6px 12px rgba(255, 255, 255, 0.5); /* Усиленная тень */
+#login-register-button:hover {
+  background-color: #ffffff;
+  box-shadow: 0 6px 12px rgba(255, 255, 255, 0.5);
   color: #000;
 }
+
+/* Стиль для поп-апа */
+.popup {
+  display: none; /* По умолчанию скрыт */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8); /* Полупрозрачный фон */
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Выше всех элементов */
+}
+
+.popup-content {
+  background-color: #fff;
+  color: #000;
+  padding: 20px;
+  border-radius: 10px;
+  width: 300px;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  font-family: 'FjallaOne', Arial, sans-serif;
+}
+
+.close-popup {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.close-popup:hover {
+  color: red;
+}
+
+#auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#auth-form input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+#auth-form button {
+  padding: 10px;
+  background-color: #ffffff;
+  color: #000000;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  font-family: 'FingerPaint', Arial, sans-serif;
+}
+
+#auth-form button:hover {
+  text-decoration: underline;
+}
+
+
 
 /* Стиль для контейнера изображений */
 .image-stack {
