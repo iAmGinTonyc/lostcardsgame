@@ -1,7 +1,4 @@
-// Переход на страницу "collect"
-document.getElementById("collect-button").addEventListener("click", () => {
-    window.location.href = "index.html";
-  });
+
   
   // Массив с ID изображений
   const imageIds = ["jack-image", "queen-image", "jacksheep-image", "king-image"];
@@ -55,3 +52,20 @@ document.getElementById("collect-button").addEventListener("click", () => {
   document.querySelectorAll(".image-stack img").forEach(img => {
     img.addEventListener("click", toggleImage);
   });
+  
+// Открытие поп-апа при нажатии на кнопку "Login/Register"
+document.getElementById("login-register-button").addEventListener("click", () => {
+  document.getElementById("popup").style.display = "flex";
+});
+
+// Закрытие поп-апа при нажатии на крестик
+document.getElementById("close-popup").addEventListener("click", () => {
+  document.getElementById("popup").style.display = "none";
+});
+
+// Закрытие поп-апа при клике вне формы
+document.getElementById("popup").addEventListener("click", (event) => {
+  if (event.target === document.getElementById("popup")) {
+    document.getElementById("popup").style.display = "none";
+  }
+});
